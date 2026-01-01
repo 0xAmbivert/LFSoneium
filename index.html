@@ -1,390 +1,281 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Soneium Score Optimizer</title>
-    <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;900&family=JetBrains+Mono&display=swap" rel="stylesheet">
+    <title>Soneium Elite | Institutional dApp</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=JetBrains+Mono&display=swap');
+
         :root {
-            --bg: #050505; --card: #0f0f0f; --border: #1f1f1f; --primary: #8957e5;
-            --og-gold: linear-gradient(45deg, #bf953f, #fcf6ba, #b38728, #fbf5b7, #aa771c);
-            --success: #00ff88; --text: #ffffff; --text-dim: #888;
+            --bg-color: #030305;
+            --glass: rgba(255, 255, 255, 0.03);
+            --glass-border: rgba(255, 255, 255, 0.08);
+            --primary-glow: #3d5afe;
+            --accent-glow: #00e5ff;
+            --text-main: #ffffff;
+            --text-dim: #94a3b8;
         }
+
+        * { box-sizing: border-box; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
 
         body {
-            background: var(--bg); color: var(--text); font-family: 'Inter', sans-serif;
-            margin: 0; display: flex; flex-direction: column; min-height: 100vh;
+            margin: 0;
+            background: var(--bg-color);
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(61, 90, 254, 0.05) 0%, transparent 40%),
+                radial-gradient(circle at 90% 80%, rgba(0, 229, 255, 0.05) 0%, transparent 40%);
+            color: var(--text-main);
+            font-family: 'Inter', sans-serif;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            overflow: hidden;
         }
 
-        nav {
-            display: flex; justify-content: space-between; align-items: center;
-            padding: 20px 60px; border-bottom: 1px solid var(--border);
-            background: rgba(0,0,0,0.8); backdrop-filter: blur(10px);
-            position: sticky; top: 0; z-index: 100;
-        }
-        .logo { font-weight: 900; font-size: 1.2rem; letter-spacing: -0.5px; }
-        .logo span { color: var(--primary); }
-
-        .nav-controls { display: flex; gap: 10px; align-items: center; }
-        .address-input { 
-            background: #111; border: 1px solid var(--border); color: white; 
-            padding: 10px; border-radius: 12px; font-size: 0.8rem; width: 220px;
-            outline: none; transition: 0.3s;
-        }
-        .address-input:focus { border-color: var(--primary); }
-
-        main {
-            flex: 1; display: flex; flex-direction: column; align-items: center;
-            padding: 40px 20px; max-width: 1200px; margin: 0 auto; width: 100%;
+        .premium-card {
+            position: relative;
+            width: 440px;
+            background: var(--glass);
+            backdrop-filter: blur(24px) saturate(180%);
+            border: 1px solid var(--glass-border);
+            border-radius: 32px;
+            padding: 40px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
         }
 
-        .timer-hero { text-align: center; margin-bottom: 40px; }
-        #timer { font-family: 'JetBrains Mono', monospace; font-size: 2.5rem; font-weight: 900; color: #ff3e3e; }
-
-        .dashboard-grid {
-            display: grid; grid-template-columns: 350px 1fr; gap: 30px; width: 100%;
+        /* Ambient Glow Behind Card */
+        .premium-card::before {
+            content: '';
+            position: absolute;
+            top: -2px; left: -2px; right: -2px; bottom: -2px;
+            background: linear-gradient(45deg, var(--primary-glow), transparent, var(--accent-glow));
+            border-radius: 34px;
+            z-index: -1;
+            opacity: 0.15;
+            filter: blur(10px);
         }
 
-        .panel { background: var(--card); border: 1px solid var(--border); border-radius: 24px; padding: 25px; }
+        .header { text-align: center; margin-bottom: 32px; }
+        .header h1 { 
+            font-size: 28px; font-weight: 700; margin: 0; 
+            letter-spacing: -0.5px;
+            background: linear-gradient(to right, #fff, #94a3b8);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .header p { color: var(--text-dim); font-size: 14px; margin-top: 8px; }
 
-        .og-card { text-align: center; margin-bottom: 20px; }
-        .og-badge-circle {
-            width: 100px; height: 100px; border-radius: 50%; margin: 0 auto 15px;
-            background: #1a1a1a; border: 1px solid #333; display: flex;
-            align-items: center; justify-content: center; font-size: 3rem;
-            filter: grayscale(1); opacity: 0.1; transition: 1.5s ease; cursor: pointer;
+        .balance-container {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 20px;
+            padding: 24px;
+            margin-bottom: 24px;
+            border: 1px solid var(--glass-border);
         }
-        .og-badge-circle.verified {
-            background: var(--og-gold); filter: grayscale(0); opacity: 1;
-            border: 2px solid #fff; box-shadow: 0 0 50px rgba(191, 149, 63, 0.4);
-            animation: gold-shimmer 3s infinite linear;
+
+        .asset-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
         }
+        .asset-row:last-child { margin-bottom: 0; }
+        .asset-info { display: flex; align-items: center; gap: 12px; }
+        .asset-label { font-size: 13px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 1px; }
+        .asset-value { font-family: 'JetBrains Mono', monospace; font-size: 18px; font-weight: 600; }
+
+        .action-grid { display: grid; gap: 12px; }
 
         .btn {
-            padding: 12px 24px; border-radius: 12px; border: none; font-weight: 700;
-            cursor: pointer; transition: 0.2s; font-size: 0.9rem;
-        }
-        .btn-view { background: #222; color: #fff; border: 1px solid var(--border); }
-        .btn-connect { background: #fff; color: #000; }
-        .btn-primary { background: var(--primary); color: #fff; width: 100%; margin-bottom: 10px; }
-        .btn-outline { background: transparent; border: 1px solid var(--border); color: var(--text-dim); width: 100%; margin-bottom: 10px; }
-        .btn-outline:hover { border-color: #555; color: #fff; }
-        .btn-loop-active { background: #ff3e3e !important; box-shadow: 0 0 20px rgba(255,62,62,0.4); }
-
-        .stats-row { display: grid; gap: 15px; margin: 20px 0; }
-        .stat-item { background: #000; padding: 15px; border-radius: 15px; text-align: center; border: 1px solid var(--border); transition: 0.3s; }
-        .stat-val { font-size: 1.5rem; font-weight: 900; color: var(--primary); display: block; }
-        
-        .log-area {
-            background: #000; border: 1px solid var(--border); border-radius: 15px;
-            padding: 20px; font-family: 'JetBrains Mono', monospace; font-size: 0.75rem;
-            color: var(--success); height: 300px; overflow-y: auto;
+            position: relative;
+            width: 100%;
+            padding: 16px;
+            border-radius: 14px;
+            border: 1px solid var(--glass-border);
+            background: rgba(255, 255, 255, 0.03);
+            color: white;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            overflow: hidden;
         }
 
-        .modal-overlay {
-            position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.85);
-            display:none; justify-content:center; align-items:center; z-index: 1000; backdrop-filter: blur(5px);
-        }
-        .modal {
-            background: #111; border: 1px solid var(--primary); border-radius: 24px; padding: 30px;
-            width: 320px; text-align: center; box-shadow: 0 0 30px rgba(137, 87, 229, 0.2);
+        .btn::after {
+            content: '';
+            position: absolute;
+            top: 0; left: -100%; width: 100%; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.05), transparent);
+            transition: 0.5s;
         }
 
-        footer {
-            border-top: 1px solid var(--border); padding: 40px 60px;
-            background: #000; display: flex; justify-content: space-between; align-items: flex-start;
-        }
-        .footer-links h4 { font-size: 0.8rem; color: var(--text-dim); text-transform: uppercase; margin-bottom: 15px; }
-        .footer-links a { display: block; color: #fff; text-decoration: none; margin-bottom: 8px; font-size: 0.9rem; opacity: 0.6; }
-        .footer-links a:hover { opacity: 1; color: var(--primary); }
+        .btn:hover { background: rgba(255, 255, 255, 0.07); border-color: var(--primary-glow); }
+        .btn:hover::after { left: 100%; }
 
-        @keyframes gold-shimmer { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.03); filter: brightness(1.2); } }
+        .btn-primary { 
+            background: var(--primary-glow); 
+            border: none;
+            box-shadow: 0 4px 15px rgba(61, 90, 254, 0.3);
+        }
+        .btn-primary:hover { background: #304ffe; transform: translateY(-1px); }
+
+        .system-feed {
+            margin-top: 32px;
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: 12px;
+            padding: 16px;
+            height: 120px;
+            overflow-y: auto;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 11px;
+            color: var(--text-dim);
+            border: 1px solid var(--glass-border);
+        }
+
+        .feed-line { margin-bottom: 6px; border-left: 2px solid var(--primary-glow); padding-left: 8px; }
+
+        /* Custom Scrollbar */
+        .system-feed::-webkit-scrollbar { width: 4px; }
+        .system-feed::-webkit-scrollbar-thumb { background: var(--glass-border); border-radius: 10px; }
+
+        #wallet-status { font-size: 12px; color: var(--accent-glow); margin-bottom: 8px; display: block; }
     </style>
 </head>
 <body>
 
-<div class="modal-overlay" id="modalOverlay" onclick="closeModal()">
-    <div class="modal" onclick="event.stopPropagation()">
-        <div id="modalIcon" class="modal-icon" style="font-size:3rem;">🏆</div>
-        <h3 id="modalTitle" style="margin:10px 0;">Badge Details</h3>
-        <p style="color:var(--text-dim); font-size:0.8rem; margin-bottom:20px;">Manual verification pings the contract for updates.</p>
-        <button class="btn btn-primary" id="refreshBtn">🔄 SYNC BADGE STATUS</button>
-        <button class="btn btn-outline" style="margin-top:10px;" onclick="closeModal()">CLOSE</button>
+<div class="premium-card">
+    <div class="header">
+        <i data-lucide="layers" style="color: var(--primary-glow); margin-bottom: 12px;"></i>
+        <h1>Soneium v1</h1>
+        <p>Institutional Liquidity Dashboard</p>
+    </div>
+
+    <div class="balance-container">
+        <span id="wallet-status">Status: Disconnected</span>
+        <div class="asset-row">
+            <div class="asset-info">
+                <i data-lucide="wallet" size="18" color="#94a3b8"></i>
+                <span class="asset-label">ETH Balance</span>
+            </div>
+            <span class="asset-value" id="eth">0.0000</span>
+        </div>
+        <div class="asset-row">
+            <div class="asset-info">
+                <i data-lucide="shield-check" size="18" color="#3d5afe"></i>
+                <span class="asset-label">WETH Balance</span>
+            </div>
+            <span class="asset-value" id="weth">0.0000</span>
+        </div>
+    </div>
+
+    <div class="action-grid">
+        <button class="btn btn-primary" onclick="connect()">
+            <i data-lucide="link"></i> Connect Identity
+        </button>
+        <button class="btn" onclick="wrapETH()">
+            <i data-lucide="arrow-down-to-line"></i> Wrap 0.001 ETH
+        </button>
+        <button class="btn" onclick="unwrapETH()">
+            <i data-lucide="arrow-up-from-line"></i> Unwrap 0.001 WETH
+        </button>
+        <button class="btn" onclick="refresh()">
+            <i data-lucide="refresh-cw"></i> Synchronize
+        </button>
+    </div>
+
+    <div class="system-feed" id="log">
+        <div class="feed-line">System initialized. Awaiting user handshake...</div>
     </div>
 </div>
 
-<nav>
-    <div class="logo">SONEIUM <span>SCORE v1.1</span></div>
-    <div class="nav-controls">
-        <input type="text" id="manualAddr" class="address-input" placeholder="Enter EVM Address (0x...)">
-        <button class="btn btn-view" onclick="viewOnly()">View Stats</button>
-        <button id="connBtn" class="btn btn-connect" onclick="init()">Connect Wallet</button>
-    </div>
-</nav>
-
-<main>
-    <div class="timer-hero">
-        <span style="color: var(--text-dim); text-transform: uppercase; letter-spacing: 2px; font-size: 0.7rem;">S5 Termination Countdown</span>
-        <div id="timer">-- : -- : -- : --</div>
-    </div>
-
-    <div id="ui" class="dashboard-grid" style="display:none; opacity: 0;">
-        <div class="left-col">
-            <div class="panel og-card">
-                <div id="ogBadge" class="og-badge-circle" onclick="openBadgePopup('OG', '⭐')">⭐</div>
-                <h3 style="margin:0; font-size: 1.1rem;">OG Badge</h3>
-                <p style="color: var(--text-dim); font-size: 0.75rem;">Verified on Soneium Mainnet</p>
-            </div>
-
-            <div class="panel">
-                <h4 style="margin-top:0; font-size: 0.8rem; color: var(--text-dim);">SEASONAL ARCHIVE</h4>
-                <div class="stats-row" style="grid-template-columns: repeat(2, 1fr);">
-                    <div id="s1" class="stat-item" style="opacity:0.1" onclick="openBadgePopup('S1', '💎')">💎<br><small>S1</small></div>
-                    <div id="s2" class="stat-item" style="opacity:0.1" onclick="openBadgePopup('S2', '🔥')">🔥<br><small>S2</small></div>
-                    <div id="s3" class="stat-item" style="opacity:0.1" onclick="openBadgePopup('S3', '👑')">👑<br><small>S3</small></div>
-                    <div id="s4" class="stat-item" style="opacity:0.1" onclick="openBadgePopup('S4', '🏆')">🏆<br><small>S4</small></div>
-                </div>
-            </div>
-        </div>
-
-        <div class="right-col">
-            <div class="panel">
-                <div class="stats-row" style="grid-template-columns: repeat(3, 1fr);">
-                    <div class="stat-item">
-                        <span class="stat-val" id="txs">0</span>
-                        <span style="font-size: 0.55rem; color: var(--text-dim);">SESSION TXS</span>
-                    </div>
-                    <div class="stat-item">
-                        <span class="stat-val" id="totalTxs">0</span>
-                        <span style="font-size: 0.55rem; color: var(--text-dim);">TOTAL WALLET TXS</span>
-                    </div>
-                    <div class="stat-item">
-                        <span class="stat-val" id="nfts">0</span>
-                        <span style="font-size: 0.55rem; color: var(--text-dim);">NFT MINTED</span>
-                    </div>
-                </div>
-
-                <button id="loopBtn" class="btn btn-primary" onclick="toggleLoop()">⚡ START SMART MIX LOOP (RANDOM 2-7S)</button>
-                
-                <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 10px;">
-                    <button class="btn btn-outline" onclick="poker()">🧪 POKE</button>
-                    <button class="btn btn-outline" onclick="minter()">✨ MINT NFT</button>
-                    <button class="btn btn-outline" onclick="uniSwapCycle()">🦄 UNI SWAP</button>
-                    <button class="btn btn-outline" onclick="wraper()">📥 WRAP</button>
-                    <button class="btn btn-outline" onclick="unwraper()">📤 UNWRAP ALL</button>
-                    <button class="btn btn-outline" onclick="heartbeat()">💓 HEARTBEAT</button>
-                </div>
-
-                <h4 style="margin: 25px 0 10px 0; font-size: 0.7rem; color: var(--text-dim);">LIVE EXECUTION TERMINAL</h4>
-                <div class="log-area" id="logs">SYSTEM READY... STANDING BY.</div>
-            </div>
-        </div>
-    </div>
-</main>
-
-<footer>
-    <div style="max-width: 300px;">
-        <div class="logo" style="margin-bottom: 15px;">SONEIUM <span>SCORE v1.1</span></div>
-        <p style="font-size: 0.8rem; color: var(--text-dim); line-height: 1.6;">Automated utility suite for the Soneium ecosystem. Optimized for Uniswap and official Sony network interactions.</p>
-    </div>
-    
-    <div class="footer-links">
-        <h4>Ecosystem</h4>
-        <a href="https://soneium.org" target="_blank">Official Website</a>
-        <a href="https://bridge.soneium.org" target="_blank">Soneium Bridge</a>
-        <a href="https://soneium.blockscout.com" target="_blank">Block Explorer</a>
-    </div>
-
-    <div class="footer-links">
-        <h4>Socials</h4>
-        <a href="https://x.com/soneium" target="_blank">Twitter / X</a>
-        <a href="https://discord.gg/soneium" target="_blank">Discord Community</a>
-    </div>
-
-    <div class="footer-links">
-        <h4>Support</h4>
-        <a href="https://docs.soneium.org" target="_blank">Documentation</a>
-        <a href="mailto:support@soneium.org">Email Support</a>
-    </div>
-</footer>
-
 <script>
-    const SONEIUM_ID = "0x74c"; 
-    const ADDR = {
-        S1: "0x05AB5e724848cEFeac6D303CDf94032E5Cc3552B",
-        S2: "0x6b2f6D8216E075D3a71F4aaf21d7158Af9B8dc82",
-        S3: "0x7BF02b42b9d4cCD85b497C9F53e6b7474f9c2546",
-        S4: "0x17121f9a7041ffe3ef248f7b84658d9229bad64f",
-        OG: "0x2A21B17E366836e5FFB19bd47edB03b4b551C89d",
-        POKE: "0xac3fa700149513bed425398f10a08767Aef138c3",
-        NFT: "0xe134662e9CDf904Ea3D90dB3F527054ED3687d83",
-        WETH: "0x4200000000000000000000000000000000000006",
-        UNI_ROUTER: "0x0E2850543f69F678257266E0907fF9A58B3F13dE"
-    };
-
-    let signer, provider, viewAddress, isLooping = false, countTx = 0, countNft = 0;
-
-    const defaultProvider = new ethers.providers.JsonRpcProvider("https://rpc.soneium.org");
-
-    function openBadgePopup(id, emoji) {
-        document.getElementById("modalIcon").innerText = emoji;
-        document.getElementById("modalTitle").innerText = id + " Badge Status";
-        document.getElementById("refreshBtn").onclick = () => refreshBadge(id);
-        document.getElementById("modalOverlay").style.display = "flex";
-    }
-
-    function closeModal() { document.getElementById("modalOverlay").style.display = "none"; }
-
-    async function refreshBadge(id) {
-        log(`Pinging on-chain record for ${id}...`);
-        await scan();
-        closeModal();
-    }
-
-    function runTimer() {
-        const target = new Date("Jan 15, 2026 11:30:00").getTime();
-        setInterval(() => {
-            const diff = target - new Date().getTime();
-            if (diff < 0) { document.getElementById("timer").innerText = "SEASON ENDED"; return; }
-            const d = Math.floor(diff/86400000); const h = Math.floor((diff%86400000)/3600000);
-            const m = Math.floor((diff%3600000)/60000); const s = Math.floor((diff%60000)/1000);
-            document.getElementById("timer").innerText = `${d}D : ${h}H : ${m}M : ${s}S`;
-        }, 1000);
-    }
-    runTimer();
-
-    async function viewOnly() {
-        const input = document.getElementById("manualAddr").value.trim();
-        if (!ethers.utils.isAddress(input)) return alert("Invalid EVM Address");
-        viewAddress = input;
-        provider = defaultProvider;
-        signer = null; 
-        showUI();
-        log(`Entering View Mode for: ${viewAddress}`);
-        scan();
-    }
-
-    async function init() {
-        if (!window.ethereum) return alert("MetaMask not found!");
-        provider = new ethers.providers.Web3Provider(window.ethereum);
-        await provider.send("eth_requestAccounts", []);
-        signer = provider.getSigner();
-        viewAddress = await signer.getAddress();
-        showUI();
-        document.getElementById("connBtn").innerText = "Linked";
-        log("Wallet connected successfully.");
-        scan();
-    }
-
-    function showUI() {
-        document.getElementById("ui").style.display = "grid";
-        setTimeout(() => document.getElementById("ui").style.opacity = "1", 100);
-    }
-
-    async function scan() {
-        const addr = viewAddress;
-        const abi721 = ["function balanceOf(address) view returns (uint256)"];
-        const abi1155 = ["function balanceOf(address, uint256) view returns (uint256)"];
-        
-        const total = await provider.getTransactionCount(addr);
-        document.getElementById("totalTxs").innerText = total;
-
-        try {
-            const ogC = new ethers.Contract(ADDR.OG, abi1155, provider);
-            if ((await ogC.balanceOf(addr, 0)).gt(0)) document.getElementById("ogBadge").classList.add("verified");
-        } catch(e) {}
-
-        ["S1", "S2", "S3", "S4"].forEach(async s => {
-            try {
-                const c = new ethers.Contract(ADDR[s], abi721, provider);
-                const el = document.getElementById(s.toLowerCase());
-                if ((await c.balanceOf(addr)).gt(0)) {
-                    el.style.opacity = "1";
-                    el.style.borderColor = "var(--primary)";
-                } else {
-                    el.style.opacity = "0.1";
-                    el.style.borderColor = "var(--border)";
-                }
-            } catch(e) {}
-        });
-
-        const nftC = new ethers.Contract(ADDR.NFT, abi721, provider);
-        document.getElementById("nfts").innerText = (await nftC.balanceOf(addr)).toNumber();
-    }
-
-    function log(m) { const l = document.getElementById("logs"); l.innerHTML += `[${new Date().toLocaleTimeString()}] > ${m}<br>`; l.scrollTop = l.scrollHeight; }
+    let provider, signer, myAddr;
     
-    function checkSigner() {
-        if (!signer) {
-            log("<span style='color: #ff3e3e'>Action Denied: Connect wallet to execute transactions.</span>");
-            return false;
+    const WETH_ADDR = "0x4200000000000000000000000000000000000006";
+    const WETH_ABI = [
+        "function deposit() payable",
+        "function withdraw(uint256 wad)",
+        "function balanceOf(address) view returns (uint256)"
+    ];
+
+    function log(msg) {
+        const l = document.getElementById('log');
+        const entry = document.createElement('div');
+        entry.className = 'feed-line';
+        entry.innerText = msg;
+        l.appendChild(entry);
+        l.scrollTop = l.scrollHeight;
+    }
+
+    async function connect() {
+        if (window.ethereum) {
+            try {
+                provider = new ethers.providers.Web3Provider(window.ethereum);
+                await provider.send("eth_requestAccounts", []);
+                signer = provider.getSigner();
+                myAddr = await signer.getAddress();
+                
+                document.getElementById('wallet-status').innerText = `ID: ${myAddr.substring(0,8)}...${myAddr.substring(34)}`;
+                log("Cryptographic handshake successful.");
+                refresh();
+            } catch (e) { log("Handshake failed: User rejected."); }
+        } else { 
+            log("Core Module Missing: Please install MetaMask."); 
         }
-        return true;
     }
 
-    function txUp() { 
-        countTx++; 
-        document.getElementById("txs").innerText = countTx;
-        const total = parseInt(document.getElementById("totalTxs").innerText);
-        document.getElementById("totalTxs").innerText = total + 1;
-    }
-
-    async function uniSwapCycle() {
-        if(!checkSigner()) return;
+    async function refresh() {
+        if (!signer) {
+            log("Error: Synchronization requires active connection.");
+            return;
+        }
         try {
-            const router = new ethers.Contract(ADDR.UNI_ROUTER, ["function execute(bytes commands, bytes[] inputs, uint256 deadline) payable"], signer);
-            const amount = ethers.utils.parseUnits("0.000001", "ether");
-            const tx = await router.execute("0x0b", [ethers.utils.defaultAbiCoder.encode(["address", "uint256"], [viewAddress, amount])], Math.floor(Date.now()/1000)+600, { value: amount });
-            await tx.wait(); log("UniSwap OK."); txUp();
-        } catch(e) { log("Uni Error."); }
+            const ethBal = await provider.getBalance(myAddr);
+            const wethContract = new ethers.Contract(WETH_ADDR, WETH_ABI, provider);
+            const wethBal = await wethContract.balanceOf(myAddr);
+            
+            document.getElementById('eth').innerText = parseFloat(ethers.utils.formatEther(ethBal)).toFixed(4);
+            document.getElementById('weth').innerText = parseFloat(ethers.utils.formatEther(wethBal)).toFixed(4);
+            log("Vault balances synchronized.");
+        } catch (e) { log("Sync failure: Network congestion."); }
     }
 
-    async function poker() {
-        if(!checkSigner()) return;
-        try { const tx = await new ethers.Contract(ADDR.POKE, ["function poke()"], signer).poke(); await tx.wait(); log("Poke OK."); txUp(); } catch(e) { log("Poke Failed."); }
+    async function wrapETH() {
+        if (!signer) return;
+        try {
+            log("Initiating Wrap: 0.001 ETH -> WETH...");
+            const contract = new ethers.Contract(WETH_ADDR, WETH_ABI, signer);
+            const tx = await contract.deposit({ value: ethers.utils.parseEther("0.001") });
+            log(`Broadcasting: ${tx.hash.substring(0,12)}...`);
+            await tx.wait();
+            log("Transaction finalized. Ledger updated.");
+            refresh();
+        } catch (e) { log("Transaction aborted by operator."); }
     }
 
-    async function minter() {
-        if(!checkSigner()) return;
-        try { const tx = await new ethers.Contract(ADDR.NFT, ["function mint()"], signer).mint(); await tx.wait(); log("Mint OK."); txUp(); scan(); } catch(e) { log("Mint Failed."); }
+    async function unwrapETH() {
+        if (!signer) return;
+        try {
+            log("Initiating Unwrap: 0.001 WETH -> ETH...");
+            const contract = new ethers.Contract(WETH_ADDR, WETH_ABI, signer);
+            const tx = await contract.withdraw(ethers.utils.parseEther("0.001"));
+            log(`Broadcasting: ${tx.hash.substring(0,12)}...`);
+            await tx.wait();
+            log("Transaction finalized. Ledger updated.");
+            refresh();
+        } catch (e) { log("Transaction aborted by operator."); }
     }
 
-    async function wraper() {
-        if(!checkSigner()) return;
-        try { const tx = await new ethers.Contract(ADDR.WETH, ["function deposit() payable"], signer).deposit({ value: ethers.utils.parseUnits("0.0000001", "ether") }); await tx.wait(); log("Wrap OK."); txUp(); } catch(e) { log("Wrap Failed."); }
-    }
-
-    async function unwraper() {
-        if(!checkSigner()) return;
-        try { 
-            const c = new ethers.Contract(ADDR.WETH, ["function withdraw(uint256 wad)", "function balanceOf(address) view returns (uint256)"], signer);
-            const tx = await c.withdraw(await c.balanceOf(viewAddress)); await tx.wait(); log("Unwrap OK."); txUp();
-        } catch(e) { log("Unwrap Failed."); }
-    }
-
-    async function heartbeat() {
-        if(!checkSigner()) return;
-        try { const tx = await signer.sendTransaction({to: viewAddress, value: 0}); await tx.wait(); log("Heartbeat OK."); txUp(); } catch(e) { log("Heartbeat Failed."); }
-    }
-
-    async function toggleLoop() {
-        if(!checkSigner()) return;
-        isLooping = !isLooping;
-        const btn = document.getElementById("loopBtn");
-        btn.innerText = isLooping ? "🛑 STOP AUTOMATION LOOP" : "⚡ START SMART MIX LOOP (RANDOM 2-7S)";
-        btn.className = isLooping ? "btn btn-primary btn-loop-active" : "btn btn-primary";
-        if (isLooping) runLoop();
-    }
-
-    async function runLoop() {
-        if (!isLooping) return;
-        const acts = [poker, minter, wraper, uniSwapCycle, heartbeat];
-        await acts[Math.floor(Math.random()*acts.length)]();
-        setTimeout(runLoop, Math.random()*5000 + 2000);
-    }
+    // Initialize Lucide Icons
+    lucide.createIcons();
 </script>
+
 </body>
 </html>
