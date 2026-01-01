@@ -3,196 +3,36 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Soneium Elite | Institutional dApp</title>
+    <title>Soneium dApp v1</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js"></script>
-    <script src="https://unpkg.com/lucide@latest"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=JetBrains+Mono&display=swap');
-
-        :root {
-            --bg-color: #030305;
-            --glass: rgba(255, 255, 255, 0.03);
-            --glass-border: rgba(255, 255, 255, 0.08);
-            --primary-glow: #3d5afe;
-            --accent-glow: #00e5ff;
-            --text-main: #ffffff;
-            --text-dim: #94a3b8;
-        }
-
-        * { box-sizing: border-box; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
-
-        body {
-            margin: 0;
-            background: var(--bg-color);
-            background-image: 
-                radial-gradient(circle at 10% 20%, rgba(61, 90, 254, 0.05) 0%, transparent 40%),
-                radial-gradient(circle at 90% 80%, rgba(0, 229, 255, 0.05) 0%, transparent 40%);
-            color: var(--text-main);
-            font-family: 'Inter', sans-serif;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            min-height: 100vh;
-            overflow: hidden;
-        }
-
-        .premium-card {
-            position: relative;
-            width: 440px;
-            background: var(--glass);
-            backdrop-filter: blur(24px) saturate(180%);
-            border: 1px solid var(--glass-border);
-            border-radius: 32px;
-            padding: 40px;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-        }
-
-        /* Ambient Glow Behind Card */
-        .premium-card::before {
-            content: '';
-            position: absolute;
-            top: -2px; left: -2px; right: -2px; bottom: -2px;
-            background: linear-gradient(45deg, var(--primary-glow), transparent, var(--accent-glow));
-            border-radius: 34px;
-            z-index: -1;
-            opacity: 0.15;
-            filter: blur(10px);
-        }
-
-        .header { text-align: center; margin-bottom: 32px; }
-        .header h1 { 
-            font-size: 28px; font-weight: 700; margin: 0; 
-            letter-spacing: -0.5px;
-            background: linear-gradient(to right, #fff, #94a3b8);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-        .header p { color: var(--text-dim); font-size: 14px; margin-top: 8px; }
-
-        .balance-container {
-            background: rgba(0, 0, 0, 0.2);
-            border-radius: 20px;
-            padding: 24px;
-            margin-bottom: 24px;
-            border: 1px solid var(--glass-border);
-        }
-
-        .asset-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 16px;
-        }
-        .asset-row:last-child { margin-bottom: 0; }
-        .asset-info { display: flex; align-items: center; gap: 12px; }
-        .asset-label { font-size: 13px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 1px; }
-        .asset-value { font-family: 'JetBrains Mono', monospace; font-size: 18px; font-weight: 600; }
-
-        .action-grid { display: grid; gap: 12px; }
-
-        .btn {
-            position: relative;
-            width: 100%;
-            padding: 16px;
-            border-radius: 14px;
-            border: 1px solid var(--glass-border);
-            background: rgba(255, 255, 255, 0.03);
-            color: white;
-            font-size: 15px;
-            font-weight: 600;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            overflow: hidden;
-        }
-
-        .btn::after {
-            content: '';
-            position: absolute;
-            top: 0; left: -100%; width: 100%; height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.05), transparent);
-            transition: 0.5s;
-        }
-
-        .btn:hover { background: rgba(255, 255, 255, 0.07); border-color: var(--primary-glow); }
-        .btn:hover::after { left: 100%; }
-
-        .btn-primary { 
-            background: var(--primary-glow); 
-            border: none;
-            box-shadow: 0 4px 15px rgba(61, 90, 254, 0.3);
-        }
-        .btn-primary:hover { background: #304ffe; transform: translateY(-1px); }
-
-        .system-feed {
-            margin-top: 32px;
-            background: rgba(0, 0, 0, 0.4);
-            border-radius: 12px;
-            padding: 16px;
-            height: 120px;
-            overflow-y: auto;
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 11px;
-            color: var(--text-dim);
-            border: 1px solid var(--glass-border);
-        }
-
-        .feed-line { margin-bottom: 6px; border-left: 2px solid var(--primary-glow); padding-left: 8px; }
-
-        /* Custom Scrollbar */
-        .system-feed::-webkit-scrollbar { width: 4px; }
-        .system-feed::-webkit-scrollbar-thumb { background: var(--glass-border); border-radius: 10px; }
-
-        #wallet-status { font-size: 12px; color: var(--accent-glow); margin-bottom: 8px; display: block; }
+        :root { --bg: #0f111a; --card: #1a1d29; --text: #f0f0f0; --primary: #3d5afe; }
+        body { background: var(--bg); color: var(--text); font-family: sans-serif; display: flex; justify-content: center; padding: 40px; }
+        .card { background: var(--card); padding: 30px; border-radius: 16px; width: 400px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); border: 1px solid #2d3142; }
+        h2 { margin-top: 0; color: var(--primary); text-align: center; }
+        .stats { background: #000; padding: 15px; border-radius: 8px; margin: 20px 0; font-family: monospace; font-size: 13px; }
+        .btn { width: 100%; padding: 14px; margin: 10px 0; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; background: #2a2e3f; color: white; transition: 0.3s; }
+        .btn:hover { background: var(--primary); }
+        #log { margin-top: 20px; font-size: 11px; color: #888; height: 100px; overflow-y: auto; border-top: 1px solid #333; padding-top: 10px; }
     </style>
 </head>
 <body>
 
-<div class="premium-card">
-    <div class="header">
-        <i data-lucide="layers" style="color: var(--primary-glow); margin-bottom: 12px;"></i>
-        <h1>Soneium v1</h1>
-        <p>Institutional Liquidity Dashboard</p>
+<div class="card">
+    <h2>Soneium v1</h2>
+    
+    <div class="stats">
+        <div>Address: <span id="addr">Not Connected</span></div>
+        <div>ETH: <span id="eth">0.00</span></div>
+        <div>WETH: <span id="weth">0.00</span></div>
     </div>
 
-    <div class="balance-container">
-        <span id="wallet-status">Status: Disconnected</span>
-        <div class="asset-row">
-            <div class="asset-info">
-                <i data-lucide="wallet" size="18" color="#94a3b8"></i>
-                <span class="asset-label">ETH Balance</span>
-            </div>
-            <span class="asset-value" id="eth">0.0000</span>
-        </div>
-        <div class="asset-row">
-            <div class="asset-info">
-                <i data-lucide="shield-check" size="18" color="#3d5afe"></i>
-                <span class="asset-label">WETH Balance</span>
-            </div>
-            <span class="asset-value" id="weth">0.0000</span>
-        </div>
-    </div>
+    <button class="btn" style="background: var(--primary);" onclick="connect()">Connect Wallet</button>
+    <button class="btn" onclick="wrapETH()">Wrap 0.001 ETH</button>
+    <button class="btn" onclick="unwrapETH()">Unwrap 0.001 WETH</button>
+    <button class="btn" onclick="refresh()">Refresh Balances</button>
 
-    <div class="action-grid">
-        <button class="btn btn-primary" onclick="connect()">
-            <i data-lucide="link"></i> Connect Identity
-        </button>
-        <button class="btn" onclick="wrapETH()">
-            <i data-lucide="arrow-down-to-line"></i> Wrap 0.001 ETH
-        </button>
-        <button class="btn" onclick="unwrapETH()">
-            <i data-lucide="arrow-up-from-line"></i> Unwrap 0.001 WETH
-        </button>
-        <button class="btn" onclick="refresh()">
-            <i data-lucide="refresh-cw"></i> Synchronize
-        </button>
-    </div>
-
-    <div class="system-feed" id="log">
-        <div class="feed-line">System initialized. Awaiting user handshake...</div>
-    </div>
+    <div id="log">>> Dashboard v1 ready.</div>
 </div>
 
 <script>
@@ -207,75 +47,54 @@
 
     function log(msg) {
         const l = document.getElementById('log');
-        const entry = document.createElement('div');
-        entry.className = 'feed-line';
-        entry.innerText = msg;
-        l.appendChild(entry);
+        l.innerHTML += `<br>> ${msg}`;
         l.scrollTop = l.scrollHeight;
     }
 
     async function connect() {
         if (window.ethereum) {
-            try {
-                provider = new ethers.providers.Web3Provider(window.ethereum);
-                await provider.send("eth_requestAccounts", []);
-                signer = provider.getSigner();
-                myAddr = await signer.getAddress();
-                
-                document.getElementById('wallet-status').innerText = `ID: ${myAddr.substring(0,8)}...${myAddr.substring(34)}`;
-                log("Cryptographic handshake successful.");
-                refresh();
-            } catch (e) { log("Handshake failed: User rejected."); }
-        } else { 
-            log("Core Module Missing: Please install MetaMask."); 
-        }
+            provider = new ethers.providers.Web3Provider(window.ethereum);
+            await provider.send("eth_requestAccounts", []);
+            signer = provider.getSigner();
+            myAddr = await signer.getAddress();
+            document.getElementById('addr').innerText = myAddr.substring(0,6) + "..." + myAddr.substring(38);
+            log("Wallet connected.");
+            refresh();
+        } else { alert("Install MetaMask"); }
     }
 
     async function refresh() {
-        if (!signer) {
-            log("Error: Synchronization requires active connection.");
-            return;
-        }
-        try {
-            const ethBal = await provider.getBalance(myAddr);
-            const wethContract = new ethers.Contract(WETH_ADDR, WETH_ABI, provider);
-            const wethBal = await wethContract.balanceOf(myAddr);
-            
-            document.getElementById('eth').innerText = parseFloat(ethers.utils.formatEther(ethBal)).toFixed(4);
-            document.getElementById('weth').innerText = parseFloat(ethers.utils.formatEther(wethBal)).toFixed(4);
-            log("Vault balances synchronized.");
-        } catch (e) { log("Sync failure: Network congestion."); }
+        if (!signer) return;
+        const ethBal = await provider.getBalance(myAddr);
+        const wethContract = new ethers.Contract(WETH_ADDR, WETH_ABI, provider);
+        const wethBal = await wethContract.balanceOf(myAddr);
+        
+        document.getElementById('eth').innerText = parseFloat(ethers.utils.formatEther(ethBal)).toFixed(4);
+        document.getElementById('weth').innerText = parseFloat(ethers.utils.formatEther(wethBal)).toFixed(4);
+        log("Balances updated.");
     }
 
     async function wrapETH() {
-        if (!signer) return;
         try {
-            log("Initiating Wrap: 0.001 ETH -> WETH...");
+            log("Wrapping ETH...");
             const contract = new ethers.Contract(WETH_ADDR, WETH_ABI, signer);
             const tx = await contract.deposit({ value: ethers.utils.parseEther("0.001") });
-            log(`Broadcasting: ${tx.hash.substring(0,12)}...`);
             await tx.wait();
-            log("Transaction finalized. Ledger updated.");
+            log("Success! Wrapped 0.001 ETH.");
             refresh();
-        } catch (e) { log("Transaction aborted by operator."); }
+        } catch (e) { log("Error: " + e.message.substring(0, 40)); }
     }
 
     async function unwrapETH() {
-        if (!signer) return;
         try {
-            log("Initiating Unwrap: 0.001 WETH -> ETH...");
+            log("Unwrapping WETH...");
             const contract = new ethers.Contract(WETH_ADDR, WETH_ABI, signer);
             const tx = await contract.withdraw(ethers.utils.parseEther("0.001"));
-            log(`Broadcasting: ${tx.hash.substring(0,12)}...`);
             await tx.wait();
-            log("Transaction finalized. Ledger updated.");
+            log("Success! Unwrapped 0.001 WETH.");
             refresh();
-        } catch (e) { log("Transaction aborted by operator."); }
+        } catch (e) { log("Error: " + e.message.substring(0, 40)); }
     }
-
-    // Initialize Lucide Icons
-    lucide.createIcons();
 </script>
-
 </body>
 </html>
