@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Soneium Score Optimizer</title>
+    <title>Soneium Score Optimizer | Full Suite</title>
     <link rel="icon" href="https://soneium.org/favicon.ico" type="image/x-icon">
     <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;900&family=JetBrains+Mono&display=swap" rel="stylesheet">
@@ -26,7 +26,7 @@
         .timer-hero { text-align: center; margin-bottom: 40px; }
         #timer { font-family: 'JetBrains Mono', monospace; font-size: 2.5rem; font-weight: 900; color: #ff3e3e; }
         .dashboard-grid { display: grid; grid-template-columns: 350px 1fr; gap: 30px; width: 100%; }
-        .panel { background: var(--card); border: 1px solid var(--border); border-radius: 24px; padding: 25px; }
+        .panel { background: var(--card); border: 1px solid var(--border); border-radius: 24px; padding: 25px; margin-bottom: 20px; }
         .btn { padding: 12px 24px; border-radius: 12px; border: none; font-weight: 700; cursor: pointer; transition: 0.2s; font-size: 0.9rem; }
         .btn-view { background: #222; color: #fff; border: 1px solid var(--border); }
         .btn-connect { background: #fff; color: #000; }
@@ -35,7 +35,10 @@
         .btn-outline:hover { border-color: #555; color: #fff; }
         .stat-item { background: #000; padding: 15px; border-radius: 15px; text-align: center; border: 1px solid var(--border); }
         .stat-val { font-size: 1.5rem; font-weight: 900; color: var(--primary); display: block; }
-        .log-area { background: #000; border: 1px solid var(--border); border-radius: 15px; padding: 20px; font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; color: var(--success); height: 300px; overflow-y: auto; }
+        .badge-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; margin-top: 15px; }
+        .badge-box { background: #111; padding: 10px; border-radius: 10px; text-align: center; font-size: 0.7rem; border: 1px solid var(--border); }
+        .badge-on { border-color: var(--success); color: var(--success); }
+        .log-area { background: #000; border: 1px solid var(--border); border-radius: 15px; padding: 20px; font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; color: var(--success); height: 250px; overflow-y: auto; }
     </style>
 </head>
 <body>
@@ -43,26 +46,38 @@
 <nav>
     <div class="logo"><img src="https://soneium.org/favicon.ico">SONEIUM <span>SCORE</span></div>
     <div class="nav-controls">
-        <input type="text" id="manualAddr" class="address-input" placeholder="0x...">
-        <button class="btn btn-view" onclick="viewOnly()">View Stats</button>
+        <input type="text" id="manualAddr" class="address-input" placeholder="Enter Wallet Address">
+        <button class="btn btn-view" onclick="viewStats()">View Stats</button>
         <button id="connBtn" class="btn btn-connect" onclick="init()">Connect Wallet</button>
     </div>
 </nav>
 
 <main>
     <div class="timer-hero">
-        <span style="color: var(--text-dim); text-transform: uppercase; letter-spacing: 2px; font-size: 0.7rem;">SEASON 06: SYNCED WITH PORTAL</span>
+        <span style="color: var(--text-dim); text-transform: uppercase; letter-spacing: 2px; font-size: 0.7rem;">SEASON 06: PUSH BEYOND ENDS IN</span>
         <div id="timer">-- : -- : -- : --</div>
     </div>
 
     <div id="ui" class="dashboard-grid" style="display:none;">
         <div class="left-col">
             <div class="panel">
-                <h4 style="margin-top:0; font-size: 0.8rem; color: var(--text-dim);">S6 ASSETS</h4>
+                <h4 style="margin-top:0; font-size: 0.8rem; color: var(--text-dim);">ASSETS & BADGES</h4>
                 <div class="stat-item">
                     <span class="stat-val" id="usdcBalance">0.00</span>
-                    <span style="font-size: 0.55rem; color: var(--text-dim);">USDC.e</span>
+                    <span style="font-size: 0.55rem; color: var(--text-dim);">USDC.e (Season 6)</span>
                 </div>
+                <div class="badge-grid">
+                    <div id="b1" class="badge-box">S1</div>
+                    <div id="b2" class="badge-box">S2</div>
+                    <div id="b3" class="badge-box">S3</div>
+                    <div id="b4" class="badge-box">S4</div>
+                    <div id="bog" class="badge-box">OG</div>
+                </div>
+            </div>
+            <div class="panel">
+                <h4 style="margin-top:0; font-size: 0.8rem; color: var(--text-dim);">UNISWAP TOOLS</h4>
+                <button class="btn btn-outline" onclick="uniWrap()">Wrap ETH (Uni)</button>
+                <button class="btn btn-outline" onclick="uniUnwrapAll()">Unwrap All WETH</button>
             </div>
         </div>
 
@@ -70,7 +85,7 @@
             <div class="panel">
                 <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-bottom: 20px;">
                     <div class="stat-item"><span class="stat-val" id="txs">0</span><small>SESSION TXS</small></div>
-                    <div class="stat-item"><span class="stat-val" id="totalTxs">0</span><small>WALLET TOTAL</small></div>
+                    <div class="stat-item"><span class="stat-val" id="totalTxs">--</span><small>WALLET TOTAL</small></div>
                     <div class="stat-item"><span class="stat-val" id="nfts">0</span><small>NFTs</small></div>
                 </div>
 
@@ -78,14 +93,13 @@
                 
                 <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 10px;">
                     <button class="btn btn-outline" onclick="veloSwap()">🚲 VELO: ETH→USDC</button>
-                    <button class="btn btn-outline" onclick="sweepUSDC()">🧹 SWEEP USDC→ETH</button>
+                    <button class="btn btn-outline" onclick="sweepUSDC()">🧹 VELO: SWEEP USDC</button>
                     <button class="btn btn-outline" onclick="poker()">🧪 POKE</button>
                     <button class="btn btn-outline" onclick="minter()">✨ MINT NFT</button>
-                    <button class="btn btn-outline" onclick="wraper()">📥 WRAP</button>
                     <button class="btn btn-outline" onclick="heartbeat()">💓 HEARTBEAT</button>
                 </div>
 
-                <div class="log-area" id="logs">TERMINAL READY...</div>
+                <div class="log-area" id="logs">SYSTEM RESTORED & READY...</div>
             </div>
         </div>
     </div>
@@ -97,21 +111,21 @@
         VELO_ROUTER: "0xa062aE8A9c5e11aaA026fc2670B0D65cCc8B2858", 
         WETH: "0x4200000000000000000000000000000000000006",
         POKE: "0xac3fa700149513bed425398f10a08767Aef138c3",
-        NFT: "0xe134662e9CDf904Ea3D90dB3F527054ED3687d83"
+        NFT: "0xe134662e9CDf904Ea3D90dB3F527054ED3687d83",
+        BADGES: {
+            S1: "0x5678...", S2: "0x9101...", S3: "0x1121...", S4: "0x3141...", OG: "0xe134662e9CDf904Ea3D90dB3F527054ED3687d83"
+        }
     };
 
     let signer, provider, viewAddress, isLooping = false, countTx = 0;
 
     function runTimer() {
-        // SYNCHRONIZED TARGET: Feb 12, 2026, 12:00:00 PM (Noon)
         const target = new Date("Feb 12, 2026 12:00:00").getTime();
         setInterval(() => {
             const diff = target - new Date().getTime();
-            if (diff < 0) { document.getElementById("timer").innerText = "SEASON COMPLETE"; return; }
-            const d = Math.floor(diff/86400000); 
-            const h = Math.floor((diff%86400000)/3600000);
-            const m = Math.floor((diff%3600000)/60000); 
-            const s = Math.floor((diff%60000)/1000);
+            if (diff < 0) { document.getElementById("timer").innerText = "SEASON ENDED"; return; }
+            const d = Math.floor(diff/86400000); const h = Math.floor((diff%86400000)/3600000);
+            const m = Math.floor((diff%3600000)/60000); const s = Math.floor((diff%60000)/1000);
             document.getElementById("timer").innerText = `${d}D : ${h}H : ${m}M : ${s}S`;
         }, 1000);
     }
@@ -123,39 +137,80 @@
         signer = provider.getSigner();
         viewAddress = await signer.getAddress();
         document.getElementById("ui").style.display = "grid";
-        log("Wallet Connected. Target Sync OK.");
+        refreshAll();
+    }
+
+    async function viewStats() {
+        viewAddress = document.getElementById("manualAddr").value;
+        if(!ethers.utils.isAddress(viewAddress)) return alert("Invalid Address");
+        provider = new ethers.providers.Web3Provider(window.ethereum);
+        document.getElementById("ui").style.display = "grid";
+        refreshAll();
+    }
+
+    async function refreshAll() {
         updateBalances();
+        checkBadges();
+        const txCount = await provider.getTransactionCount(viewAddress);
+        document.getElementById("totalTxs").innerText = txCount;
     }
 
     async function updateBalances() {
-        try {
-            const usdc = new ethers.Contract(ADDR.USDC_E, ["function balanceOf(address) view returns (uint256)"], provider);
-            const bal = await usdc.balanceOf(viewAddress);
-            document.getElementById("usdcBalance").innerText = parseFloat(ethers.utils.formatUnits(bal, 6)).toFixed(4);
-        } catch(e) {}
+        const usdc = new ethers.Contract(ADDR.USDC_E, ["function balanceOf(address) view returns (uint256)"], provider);
+        const bal = await usdc.balanceOf(viewAddress);
+        document.getElementById("usdcBalance").innerText = parseFloat(ethers.utils.formatUnits(bal, 6)).toFixed(4);
     }
 
+    async function checkBadges() {
+        const abi = ["function balanceOf(address) view returns (uint256)"];
+        for (let s in ADDR.BADGES) {
+            try {
+                const contract = new ethers.Contract(ADDR.BADGES[s], abi, provider);
+                const count = await contract.balanceOf(viewAddress);
+                if (count > 0) document.getElementById(`b${s.toLowerCase()}`).classList.add('badge-on');
+            } catch(e) {}
+        }
+    }
+
+    // Uniswap Features Restored
+    async function uniWrap() {
+        try {
+            const tx = await signer.sendTransaction({ to: ADDR.WETH, value: ethers.utils.parseUnits("0.0001", "ether") });
+            await tx.wait(); log("UniWrap OK."); txUp();
+        } catch(e) { log("Wrap Fail."); }
+    }
+
+    async function uniUnwrapAll() {
+        try {
+            const weth = new ethers.Contract(ADDR.WETH, ["function balanceOf(address) view returns (uint256)", "function withdraw(uint256)"], signer);
+            const bal = await weth.balanceOf(viewAddress);
+            if(bal.eq(0)) return log("No WETH to unwrap.");
+            const tx = await weth.withdraw(bal);
+            await tx.wait(); log("Unwrap All OK."); txUp();
+        } catch(e) { log("Unwrap Fail."); }
+    }
+
+    // Velodrome S6 RESTORED
     async function veloSwap() {
         try {
             const router = new ethers.Contract(ADDR.VELO_ROUTER, ["function swapExactETHForTokens(uint amountOutMin, tuple(address from, address to, bool stable, address factory)[] routes, address to, uint deadline) payable"], signer);
             const route = [{ from: ADDR.WETH, to: ADDR.USDC_E, stable: false, factory: "0xF1046053aa5682b4F9a81b5481394DA16BE5FF5a" }];
             const tx = await router.swapExactETHForTokens(0, route, viewAddress, Math.floor(Date.now()/1000)+600, { value: ethers.utils.parseUnits("0.0000001", "ether") });
-            await tx.wait(); log("ETH → USDC.e (Velo Slipstream) OK."); txUp(); updateBalances();
-        } catch(e) { log("Swap Error."); }
+            await tx.wait(); log("Velo Swap OK."); txUp(); updateBalances();
+        } catch(e) { log("Velo Fail."); }
     }
 
     async function sweepUSDC() {
         try {
             const usdc = new ethers.Contract(ADDR.USDC_E, ["function balanceOf(address) view returns (uint256)", "function approve(address, uint256) returns (bool)"], signer);
             const bal = await usdc.balanceOf(viewAddress);
-            if (bal.eq(0)) return log("Sweep: No balance.");
-            log("Unlocking USDC.e...");
+            if (bal.eq(0)) return log("No USDC to sweep.");
             await (await usdc.approve(ADDR.VELO_ROUTER, bal)).wait();
             const router = new ethers.Contract(ADDR.VELO_ROUTER, ["function swapExactTokensForETH(uint amountIn, uint amountOutMin, tuple(address from, address to, bool stable, address factory)[] routes, address to, uint deadline)"], signer);
             const route = [{ from: ADDR.USDC_E, to: ADDR.WETH, stable: false, factory: "0xF1046053aa5682b4F9a81b5481394DA16BE5FF5a" }];
             const tx = await router.swapExactTokensForETH(bal, 0, route, viewAddress, Math.floor(Date.now()/1000)+600);
-            await tx.wait(); log("Sweep All to ETH OK."); txUp(); updateBalances();
-        } catch(e) { log("Sweep Error."); }
+            await tx.wait(); log("Sweep OK."); txUp(); updateBalances();
+        } catch(e) { log("Sweep Fail."); }
     }
 
     async function poker() {
@@ -163,15 +218,11 @@
     }
 
     async function minter() {
-        try { const tx = await new ethers.Contract(ADDR.NFT, ["function mint()"], signer).mint(); await tx.wait(); log("NFT Mint OK."); txUp(); } catch(e) { log("Mint Fail."); }
-    }
-
-    async function wraper() {
-        try { const tx = await new ethers.Contract(ADDR.WETH, ["function deposit() payable"], signer).deposit({ value: ethers.utils.parseUnits("0.0000001", "ether") }); await tx.wait(); log("ETH Wrapped."); txUp(); } catch(e) { log("Wrap Fail."); }
+        try { const tx = await new ethers.Contract(ADDR.NFT, ["function mint()"], signer).mint(); await tx.wait(); log("Mint OK."); txUp(); } catch(e) { log("Mint Fail."); }
     }
 
     async function heartbeat() {
-        try { const tx = await signer.sendTransaction({to: viewAddress, value: 0}); await tx.wait(); log("Heartbeat TX OK."); txUp(); } catch(e) { log("Heartbeat Fail."); }
+        try { const tx = await signer.sendTransaction({to: viewAddress, value: 0}); await tx.wait(); log("Heartbeat OK."); txUp(); } catch(e) { log("Heartbeat Fail."); }
     }
 
     function log(m) { const l = document.getElementById("logs"); l.innerHTML += `[${new Date().toLocaleTimeString([], {hour12:false})}] > ${m}<br>`; l.scrollTop = l.scrollHeight; }
@@ -186,7 +237,7 @@
 
     async function runLoop() {
         if (!isLooping) return;
-        const acts = [poker, minter, wraper, veloSwap, heartbeat];
+        const acts = [poker, minter, veloSwap, heartbeat];
         await acts[Math.floor(Math.random()*acts.length)]();
         setTimeout(runLoop, Math.random()*5000 + 2000);
     }
