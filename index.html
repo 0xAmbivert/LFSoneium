@@ -36,7 +36,6 @@
         .stat-item { background: #000; padding: 15px; border-radius: 15px; text-align: center; border: 1px solid var(--border); }
         .stat-val { font-size: 1.5rem; font-weight: 900; color: var(--primary); display: block; }
         .log-area { background: #000; border: 1px solid var(--border); border-radius: 15px; padding: 20px; font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; color: var(--success); height: 300px; overflow-y: auto; }
-        footer { border-top: 1px solid var(--border); padding: 40px 60px; background: #000; display: flex; justify-content: space-between; }
     </style>
 </head>
 <body>
@@ -52,17 +51,17 @@
 
 <main>
     <div class="timer-hero">
-        <span style="color: var(--text-dim); text-transform: uppercase; letter-spacing: 2px; font-size: 0.7rem;">SEASON 06: PUSH BEYOND ENDS IN</span>
+        <span style="color: var(--text-dim); text-transform: uppercase; letter-spacing: 2px; font-size: 0.7rem;">SEASON 06: SYNCED WITH PORTAL</span>
         <div id="timer">-- : -- : -- : --</div>
     </div>
 
     <div id="ui" class="dashboard-grid" style="display:none;">
         <div class="left-col">
             <div class="panel">
-                <h4 style="margin-top:0; font-size: 0.8rem; color: var(--text-dim);">S6 ASSET TRACKER</h4>
+                <h4 style="margin-top:0; font-size: 0.8rem; color: var(--text-dim);">S6 ASSETS</h4>
                 <div class="stat-item">
                     <span class="stat-val" id="usdcBalance">0.00</span>
-                    <span style="font-size: 0.55rem; color: var(--text-dim);">BRIDGED USDC.e</span>
+                    <span style="font-size: 0.55rem; color: var(--text-dim);">USDC.e</span>
                 </div>
             </div>
         </div>
@@ -86,7 +85,7 @@
                     <button class="btn btn-outline" onclick="heartbeat()">💓 HEARTBEAT</button>
                 </div>
 
-                <div class="log-area" id="logs">SYSTEM READY...</div>
+                <div class="log-area" id="logs">TERMINAL READY...</div>
             </div>
         </div>
     </div>
@@ -104,11 +103,11 @@
     let signer, provider, viewAddress, isLooping = false, countTx = 0;
 
     function runTimer() {
-        // Target: February 13, 2026, 00:00:00 AM (The end of Feb 12)
-        const target = new Date("Feb 13, 2026 00:00:00").getTime();
+        // SYNCHRONIZED TARGET: Feb 12, 2026, 12:00:00 PM (Noon)
+        const target = new Date("Feb 12, 2026 12:00:00").getTime();
         setInterval(() => {
             const diff = target - new Date().getTime();
-            if (diff < 0) { document.getElementById("timer").innerText = "SEASON OVER"; return; }
+            if (diff < 0) { document.getElementById("timer").innerText = "SEASON COMPLETE"; return; }
             const d = Math.floor(diff/86400000); 
             const h = Math.floor((diff%86400000)/3600000);
             const m = Math.floor((diff%3600000)/60000); 
@@ -124,7 +123,7 @@
         signer = provider.getSigner();
         viewAddress = await signer.getAddress();
         document.getElementById("ui").style.display = "grid";
-        log("Wallet Linked for Season 6.");
+        log("Wallet Connected. Target Sync OK.");
         updateBalances();
     }
 
@@ -141,21 +140,21 @@
             const router = new ethers.Contract(ADDR.VELO_ROUTER, ["function swapExactETHForTokens(uint amountOutMin, tuple(address from, address to, bool stable, address factory)[] routes, address to, uint deadline) payable"], signer);
             const route = [{ from: ADDR.WETH, to: ADDR.USDC_E, stable: false, factory: "0xF1046053aa5682b4F9a81b5481394DA16BE5FF5a" }];
             const tx = await router.swapExactETHForTokens(0, route, viewAddress, Math.floor(Date.now()/1000)+600, { value: ethers.utils.parseUnits("0.0000001", "ether") });
-            await tx.wait(); log("Velodrome: ETH → USDC.e OK."); txUp(); updateBalances();
-        } catch(e) { log("Swap Failed."); }
+            await tx.wait(); log("ETH → USDC.e (Velo Slipstream) OK."); txUp(); updateBalances();
+        } catch(e) { log("Swap Error."); }
     }
 
     async function sweepUSDC() {
         try {
             const usdc = new ethers.Contract(ADDR.USDC_E, ["function balanceOf(address) view returns (uint256)", "function approve(address, uint256) returns (bool)"], signer);
             const bal = await usdc.balanceOf(viewAddress);
-            if (bal.eq(0)) return log("Sweep: No USDC.e to move.");
-            log("Approving Velodrome...");
+            if (bal.eq(0)) return log("Sweep: No balance.");
+            log("Unlocking USDC.e...");
             await (await usdc.approve(ADDR.VELO_ROUTER, bal)).wait();
             const router = new ethers.Contract(ADDR.VELO_ROUTER, ["function swapExactTokensForETH(uint amountIn, uint amountOutMin, tuple(address from, address to, bool stable, address factory)[] routes, address to, uint deadline)"], signer);
             const route = [{ from: ADDR.USDC_E, to: ADDR.WETH, stable: false, factory: "0xF1046053aa5682b4F9a81b5481394DA16BE5FF5a" }];
             const tx = await router.swapExactTokensForETH(bal, 0, route, viewAddress, Math.floor(Date.now()/1000)+600);
-            await tx.wait(); log("Sweep: USDC.e → ETH OK."); txUp(); updateBalances();
+            await tx.wait(); log("Sweep All to ETH OK."); txUp(); updateBalances();
         } catch(e) { log("Sweep Error."); }
     }
 
@@ -168,11 +167,11 @@
     }
 
     async function wraper() {
-        try { const tx = await new ethers.Contract(ADDR.WETH, ["function deposit() payable"], signer).deposit({ value: ethers.utils.parseUnits("0.0000001", "ether") }); await tx.wait(); log("WETH Wrap OK."); txUp(); } catch(e) { log("Wrap Fail."); }
+        try { const tx = await new ethers.Contract(ADDR.WETH, ["function deposit() payable"], signer).deposit({ value: ethers.utils.parseUnits("0.0000001", "ether") }); await tx.wait(); log("ETH Wrapped."); txUp(); } catch(e) { log("Wrap Fail."); }
     }
 
     async function heartbeat() {
-        try { const tx = await signer.sendTransaction({to: viewAddress, value: 0}); await tx.wait(); log("Heartbeat OK."); txUp(); } catch(e) { log("Heartbeat Fail."); }
+        try { const tx = await signer.sendTransaction({to: viewAddress, value: 0}); await tx.wait(); log("Heartbeat TX OK."); txUp(); } catch(e) { log("Heartbeat Fail."); }
     }
 
     function log(m) { const l = document.getElementById("logs"); l.innerHTML += `[${new Date().toLocaleTimeString([], {hour12:false})}] > ${m}<br>`; l.scrollTop = l.scrollHeight; }
