@@ -70,6 +70,38 @@
         }
         .og-badge-circle:hover { transform: scale(1.05); }
 
+        .season-archive-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+            gap: 12px;
+            margin-top: 16px;
+        }
+
+        .stat-item {
+            background: rgba(0,0,0,0.7);
+            padding: 12px;
+            border-radius: 16px;
+            text-align: center;
+            border: 1px solid var(--border);
+            transition: all 0.3s ease;
+            backdrop-filter: blur(5px);
+            cursor: pointer;
+            font-size: 2.2rem;
+            line-height: 1;
+        }
+        .stat-item:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(137,87,229,0.2); }
+        .stat-item.verified {
+            opacity: 1 !important;
+            border-color: var(--primary);
+            box-shadow: 0 0 16px rgba(137,87,229,0.4);
+        }
+        .stat-item small {
+            display: block;
+            font-size: 0.65rem;
+            margin-top: 4px;
+            color: var(--text-dim);
+        }
+
         .btn {
             padding: 14px 28px; border-radius: 16px; border: none; font-weight: 700;
             cursor: pointer; transition: all 0.3s ease; font-size: 0.95rem;
@@ -86,8 +118,8 @@
         .btn-loop-active { background: linear-gradient(45deg, #ff3e3e, #ff6b6b) !important; box-shadow: 0 0 24px rgba(255,62,62,0.5); animation: pulse 1.5s infinite; }
 
         .stats-row { display: grid; gap: 16px; margin: 24px 0; }
-        .stat-item { background: rgba(0,0,0,0.7); padding: 16px; border-radius: 20px; text-align: center; border: 1px solid var(--border); transition: all 0.3s ease; backdrop-filter: blur(5px); }
-        .stat-item:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(137,87,229,0.2); }
+        .stat-item-main { background: rgba(0,0,0,0.7); padding: 16px; border-radius: 20px; text-align: center; border: 1px solid var(--border); transition: all 0.3s ease; backdrop-filter: blur(5px); }
+        .stat-item-main:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(137,87,229,0.2); }
         .stat-val { font-size: 1.6rem; font-weight: 900; color: var(--primary); display: block; background: linear-gradient(45deg, var(--primary), #b57ff5); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
         
         .log-area {
@@ -168,11 +200,19 @@
 
             <div class="panel">
                 <h4 style="margin-top:0; font-size: 0.85rem; color: var(--text-dim);">Seasonal Archive</h4>
-                <div class="stats-row" style="grid-template-columns: repeat(2, 1fr);">
-                    <div id="s1" class="stat-item" style="opacity:0.1" onclick="openBadgePopup('S1', '💎')">💎<br><small>S1</small></div>
-                    <div id="s2" class="stat-item" style="opacity:0.1" onclick="openBadgePopup('S2', '🔥')">🔥<br><small>S2</small></div>
-                    <div id="s3" class="stat-item" style="opacity:0.1" onclick="openBadgePopup('S3', '👑')">👑<br><small>S3</small></div>
-                    <div id="s4" class="stat-item" style="opacity:0.1" onclick="openBadgePopup('S4', '🏆')">🏆<br><small>S4</small></div>
+                <div class="season-archive-grid">
+                    <div id="s1" class="stat-item" onclick="openBadgePopup('S1', '💎')">💎<small>S1</small></div>
+                    <div id="s2" class="stat-item" onclick="openBadgePopup('S2', '🔥')">🔥<small>S2</small></div>
+                    <div id="s3" class="stat-item" onclick="openBadgePopup('S3', '👑')">👑<small>S3</small></div>
+                    <div id="s4" class="stat-item" onclick="openBadgePopup('S4', '🏆')">🏆<small>S4</small></div>
+                    <div id="s5" class="stat-item" onclick="openBadgePopup('S5', '🌟')">🌟<small>S5</small></div>
+                    <div id="s6" class="stat-item" onclick="openBadgePopup('S6', '🚀')">🚀<small>S6</small></div>
+                    <div id="s7" class="stat-item" onclick="openBadgePopup('S7', '⚡')">⚡<small>S7</small></div>
+                    <div id="s8" class="stat-item" onclick="openBadgePopup('S8', '🔮')">🔮<small>S8</small></div>
+                    <div id="s9" class="stat-item" onclick="openBadgePopup('S9', '🌀')">🌀<small>S9</small></div>
+                    <div id="s10" class="stat-item" onclick="openBadgePopup('S10', '♾️')">♾️<small>S10</small></div>
+                    <div id="s11" class="stat-item" onclick="openBadgePopup('S11', '🪐')">🪐<small>S11</small></div>
+                    <div id="s12" class="stat-item" onclick="openBadgePopup('S12', '🌌')">🌌<small>S12</small></div>
                 </div>
             </div>
         </div>
@@ -180,15 +220,15 @@
         <div class="right-col">
             <div class="panel">
                 <div class="stats-row" style="grid-template-columns: repeat(3, 1fr);">
-                    <div class="stat-item">
+                    <div class="stat-item-main">
                         <span class="stat-val" id="txs">0</span>
                         <span style="font-size: 0.6rem; color: var(--text-dim);">Session TXs</span>
                     </div>
-                    <div class="stat-item">
+                    <div class="stat-item-main">
                         <span class="stat-val" id="totalTxs">0</span>
                         <span style="font-size: 0.6rem; color: var(--text-dim);">Total Wallet TXs</span>
                     </div>
-                    <div class="stat-item">
+                    <div class="stat-item-main">
                         <span class="stat-val" id="nfts">0</span>
                         <span style="font-size: 0.6rem; color: var(--text-dim);">NFT Minted</span>
                     </div>
@@ -245,7 +285,7 @@
 
 <script>
 // ────────────────────────────────────────────────
-// Your original script logic (unchanged)
+// Updated script with Season 6 timer & S1–S4 scanning only
 // ────────────────────────────────────────────────
 const SONEIUM_ID = "0x74c"; 
 const ADDR = {
@@ -279,7 +319,7 @@ async function refreshBadge(id) {
 }
 
 function runTimer() {
-    // Updated: Season 6 end date – Feb 12, 2026 12:00 PM GMT+5 (PKT)
+    // Season 6 end: February 12, 2026 12:00 PM GMT+5
     const target = new Date("2026-02-12T12:00:00+05:00").getTime();
     setInterval(() => {
         const diff = target - new Date().getTime();
@@ -287,10 +327,10 @@ function runTimer() {
             document.getElementById("timer").innerText = "Season 6 Ended"; 
             return; 
         }
-        const d = Math.floor(diff/86400000); 
-        const h = Math.floor((diff%86400000)/3600000);
-        const m = Math.floor((diff%3600000)/60000); 
-        const s = Math.floor((diff%60000)/1000);
+        const d = Math.floor(diff / 86400000);
+        const h = Math.floor((diff % 86400000) / 3600000);
+        const m = Math.floor((diff % 3600000) / 60000);
+        const s = Math.floor((diff % 60000) / 1000);
         document.getElementById("timer").innerText = `${d}D : ${h}H : ${m}M : ${s}S`;
     }, 1000);
 }
@@ -303,7 +343,7 @@ async function viewOnly() {
     provider = defaultProvider;
     signer = null; 
     showUI();
-    log(`Entering view mode for: ${viewAddress}`);
+    log(`Entering View Mode for: ${viewAddress}`);
     scan();
 }
 
@@ -337,16 +377,17 @@ async function scan() {
         if ((await ogC.balanceOf(addr, 0)).gt(0)) document.getElementById("ogBadge").classList.add("verified");
     } catch(e) {}
 
-    ["S1", "S2", "S3", "S4"].forEach(async s => {
+    // Only scan known seasons (S1–S4)
+    ["S1","S2","S3","S4"].forEach(async s => {
         try {
             const c = new ethers.Contract(ADDR[s], abi721, provider);
             const el = document.getElementById(s.toLowerCase());
-            if ((await c.balanceOf(addr)).gt(0)) {
+            if (el && (await c.balanceOf(addr)).gt(0)) {
+                el.classList.add("verified");
                 el.style.opacity = "1";
-                el.style.borderColor = "var(--primary)";
-            } else {
+            } else if (el) {
+                el.classList.remove("verified");
                 el.style.opacity = "0.1";
-                el.style.borderColor = "var(--border)";
             }
         } catch(e) {}
     });
@@ -372,13 +413,10 @@ function checkSigner() {
 function txUp() { 
     countTx++; 
     document.getElementById("txs").innerText = countTx;
-    const total = parseInt(document.getElementById("totalTxs").innerText);
+    const total = parseInt(document.getElementById("totalTxs").innerText) || 0;
     document.getElementById("totalTxs").innerText = total + 1;
 }
 
-// ────────────────────────────────────────────────
-// The rest of your transaction functions remain unchanged
-// ────────────────────────────────────────────────
 async function uniSwapCycle() {
     if(!checkSigner()) return;
     try {
