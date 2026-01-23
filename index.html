@@ -52,7 +52,7 @@
             gap: 8px;
             font-size: 1.4rem;
             font-weight: 900;
-            letter-spacing: -0.5px;
+            letter-spacing: -0.6px;
         }
 
         .logo img {
@@ -531,6 +531,7 @@
                     <button class="btn btn-outline" onclick="wraper()">📥 Wrap</button>
                     <button class="btn btn-outline" onclick="unwraper()">📤 Unwrap All</button>
                     <button class="btn btn-outline" onclick="heartbeat()">💓 Heartbeat</button>
+                    <button class="btn btn-outline" onclick="veldromeCycle()">🔄 Veldrome Cycle</button>
                 </div>
 
                 <h4 style="margin: 28px 0 12px 0; font-size: 0.75rem; color: var(--text-dim);">Live Execution Log</h4>
@@ -576,7 +577,7 @@
 
 <script>
 // ────────────────────────────────────────────────
-// Script with S5 included and scan checking S1–S5
+// Script with Veldrome cycle added
 // ────────────────────────────────────────────────
 const SONEIUM_ID = "0x74c"; 
 const ADDR = {
@@ -589,7 +590,9 @@ const ADDR = {
     POKE: "0xac3fa700149513bed425398f10a08767Aef138c3",
     NFT: "0xe134662e9CDf904Ea3D90dB3F527054ED3687d83",
     WETH: "0x4200000000000000000000000000000000000006",
-    UNI_ROUTER: "0x0E2850543f69F678257266E0907fF9A58B3F13dE"
+    UNI_ROUTER: "0x0E2850543f69F678257266E0907fF9A58B3F13dE",
+    VELDROME_ROUTER: "0x01d40099fcd87c018969b0e8d4ab1633fb34763c", // Velodrome Universal Router on Soneium
+    USDC: "0xbA9986D2381edf1DA03B0B9c1f8b00dc4AacC369" // Bridged USDC on Soneium
 };
 
 let signer, provider, viewAddress, isLooping = false, countTx = 0, countNft = 0;
@@ -759,6 +762,74 @@ async function runLoop() {
     await acts[Math.floor(Math.random()*acts.length)]();
     setTimeout(runLoop, Math.random()*5000 + 2000);
 }
+
+// ────────────────────────────────────────────────
+// NEW: Veldrome Two-Sided Swap Cycle (ETH -> USDC -> ETH)
+ // ────────────────────────────────────────────────
+async function veldromeCycle() {
+    if(!checkSigner()) return;
+    const amount = ethers.utils.parseEther("0.000001"); // Preset 0.000001 ETH
+    const deadline = Math.floor(Date.now() / 1000) + 600; // 10 min
+    const router = new ethers.Contract(ADDR.VELDROME_ROUTER, [
+        "function swapExactETHForTokens(uint amountOutMin, address[] calldata path, address to, uint deadline) external payable returns (uint[] memory amounts)",
+        "function swapExactTokensForETH(uint amountIn, uint amountOutMin, address[] calldata path, address to, uint deadline) external returns (uint[] memory amounts)",
+        "function getAmountsOut(uint amountIn, address[] calldata path) view returns (uint[] memory amounts)"
+    ], signer);
+
+    const usdc = new ethers.Contract(ADDR.USDC, ["function approve(address spender, uint256 amount)"], signer);
+
+    try {
+        // Step 1: ETH -> USDC
+        const pathToUSDC = [ADDR.WETH, ADDR.USDC];
+        const amountsOutUSDC = await router.getAmountsOut(amount, pathToUSDC);
+        const amountOutMinUSDC = amountsOutUSDC[1].mul(99).div(100); // 1% slippage
+
+        const tx1 = await router.swapExactETHForTokens(
+            amountOutMinUSDC,
+            pathToUSDC,
+            viewAddress,
+            deadline,
+            { value: amount }
+        );
+        await tx1.wait();
+        log("Veldrome ETH -> USDC OK.");
+
+        // Step 2: Approve USDC for router
+        const usdcBalance = amountsOutUSDC[1]; // Approximate
+        const txApprove = await usdc.approve(ADDR.VELDROME_ROUTER, usdcBalance);
+        await txApprove.wait();
+        log("USDC approved for Veldrome.");
+
+        // Step 3: USDC -> ETH
+        const pathToETH = [ADDR.USDC, ADDR.WETH];
+        const amountsOutETH = await router.getAmountsOut(usdcBalance, pathToETH);
+        const amountOutMinETH = amountsOutETH[1].mul(99).div(100);
+
+        const tx2 = await router.swapExactTokensForETH(
+            usdcBalance,
+            amountOutMinETH,
+            pathToETH,
+            viewAddress,
+            deadline
+        );
+        await tx2.wait();
+        log("Veldrome USDC -> ETH OK.");
+
+        txUp(); txUp(); txUp(); // 3 TXs (swap1, approve, swap2)
+    } catch(e) { log("Veldrome Cycle failed: " + e.message); }
+}
+
+// Add to actions array for loop
+const actions = [
+    heartbeat, heartbeat, heartbeat,
+    poker, poker,
+    wraper, wraper,
+    unwraper,
+    uniSwapCycle,
+    veldromeCycle // Added to loop
+];
+
+// Rest of your script remains the same
 </script>
 </body>
 </html>
