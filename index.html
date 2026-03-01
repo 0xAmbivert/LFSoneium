@@ -438,7 +438,7 @@
 
 <main>
     <div class="timer-hero">
-        <span style="color: var(--text-dim); text-transform: uppercase; letter-spacing: 2.5px; font-size: 0.75rem;">Season 6 Countdown</span>
+        <span style="color: var(--text-dim); text-transform: uppercase; letter-spacing: 2.5px; font-size: 0.75rem;">Season 7 Countdown</span>
         <div id="timer">-- : -- : -- : --</div>
     </div>
 
@@ -576,7 +576,29 @@
 
 <script>
 // ────────────────────────────────────────────────
-// Script with Season 6 added and Veldrome removed
+// Timer updated for Season 7 end (10 days, 11 hours, 48 minutes from ~March 02, 2026 00:12 PKT)
+ // Approximate end: March 12, 2026 12:00 PM PKT
+// ────────────────────────────────────────────────
+function runTimer() {
+    const target = new Date("2026-03-12T12:00:00+05:00").getTime();
+
+    setInterval(() => {
+        const diff = target - new Date().getTime();
+        if (diff < 0) { 
+            document.getElementById("timer").innerText = "Season 7 Ended"; 
+            return; 
+        }
+        const d = Math.floor(diff / 86400000);
+        const h = Math.floor((diff % 86400000) / 3600000);
+        const m = Math.floor((diff % 3600000) / 60000);
+        const s = Math.floor((diff % 60000) / 1000);
+        document.getElementById("timer").innerText = `${d}D : ${h}H : ${m}M : ${s}S`;
+    }, 1000);
+}
+runTimer();
+
+// ────────────────────────────────────────────────
+// Rest of the script (unchanged from your last working version)
 // ────────────────────────────────────────────────
 const SONEIUM_ID = "0x74c"; 
 const ADDR = {
@@ -585,7 +607,6 @@ const ADDR = {
     S3: "0x7BF02b42b9d4cCD85b497C9F53e6b7474f9c2546",
     S4: "0x17121f9a7041ffe3ef248f7b84658d9229bad64f",
     S5: "0xD8d14f829665183049707E0bDD93f9012bB3c4C2",
-    S6: "0x...Season6-contract-address-here...", // ← Replace with actual Season 6 contract address
     OG: "0x2A21B17E366836e5FFB19bd47edB03b4b551C89d",
     POKE: "0xac3fa700149513bed425398f10a08767Aef138c3",
     NFT: "0xe134662e9CDf904Ea3D90dB3F527054ED3687d83",
@@ -610,20 +631,6 @@ async function refreshBadge(id) {
     await scan();
     closeModal();
 }
-
-function runTimer() {
-    const target = new Date("2026-02-12T12:00:00+05:00").getTime();
-    setInterval(() => {
-        const diff = target - new Date().getTime();
-        if (diff < 0) { document.getElementById("timer").innerText = "Season 6 Ended"; return; }
-        const d = Math.floor(diff / 86400000);
-        const h = Math.floor((diff % 86400000) / 3600000);
-        const m = Math.floor((diff % 3600000) / 60000);
-        const s = Math.floor((diff % 60000) / 1000);
-        document.getElementById("timer").innerText = `${d}D : ${h}H : ${m}M : ${s}S`;
-    }, 1000);
-}
-runTimer();
 
 async function viewOnly() {
     const input = document.getElementById("manualAddr").value.trim();
@@ -670,8 +677,7 @@ async function scan() {
         }
     } catch(e) {}
 
-    // Scan S1 through S6
-    ["S1","S2","S3","S4","S5","S6"].forEach(async s => {
+    ["S1","S2","S3","S4","S5"].forEach(async s => {
         try {
             const c = new ethers.Contract(ADDR[s], abi721, provider);
             const el = document.getElementById(s.toLowerCase());
