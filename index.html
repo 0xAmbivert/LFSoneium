@@ -8,65 +8,405 @@
     <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;900&family=JetBrains+Mono&display=swap" rel="stylesheet">
     <style>
-        /* Your existing CSS - unchanged */
         :root {
-            --bg: #050505; --card: rgba(15,15,15,0.8); --border: rgba(31,31,31,0.5); --primary: #8957e5;
+            --bg: #050505;
+            --card: rgba(15,15,15,0.8);
+            --border: rgba(31,31,31,0.5);
+            --primary: #8957e5;
             --og-gold: linear-gradient(45deg, #bf953f, #fcf6ba, #b38728, #fbf5b7, #aa771c);
-            --success: #00ff88; --text: #ffffff; --text-dim: #888;
-            --glass-blur: blur(20px); --shadow-neu: 0 4px 6px rgba(0,0,0,0.1), inset 0 1px 3px rgba(255,255,255,0.05);
+            --success: #00ff88;
+            --text: #ffffff;
+            --text-dim: #888;
+            --glass-blur: blur(20px);
+            --shadow-neu: 0 4px 6px rgba(0,0,0,0.1), inset 0 1px 3px rgba(255,255,255,0.05);
         }
 
-        body { background: var(--bg); color: var(--text); font-family: 'Inter', sans-serif; margin: 0; display: flex; flex-direction: column; min-height: 100vh; overflow-x: hidden; }
-        nav { display: flex; justify-content: space-between; align-items: center; padding: 20px 60px; border-bottom: 1px solid var(--border); background: rgba(0,0,0,0.6); backdrop-filter: var(--glass-blur); position: sticky; top: 0; z-index: 100; box-shadow: var(--shadow-neu); }
-        .logo { display: flex; align-items: baseline; gap: 8px; font-size: 1.4rem; font-weight: 900; letter-spacing: -0.6px; }
-        .logo img { width: 28px; height: 28px; border-radius: 50%; box-shadow: 0 0 10px rgba(137,87,229,0.3); }
-        .logo .soneium { font-weight: 900; font-size: 1em; }
-        .logo .score { font-weight: 300; font-size: 0.92em; background: linear-gradient(45deg, var(--primary), #b57ff5); -webkit-background-clip: text; -webkit-text-fill-color: transparent; line-height: 1; }
-        .nav-controls { display: flex; gap: 12px; align-items: center; }
-        .address-input { background: rgba(17,17,17,0.7); border: 1px solid var(--border); color: white; padding: 12px 16px; border-radius: 16px; font-size: 0.85rem; width: 240px; outline: none; transition: all 0.3s ease; backdrop-filter: blur(5px); }
-        .address-input:focus { border-color: var(--primary); box-shadow: 0 0 8px rgba(137,87,229,0.4); transform: scale(1.02); }
-        main { flex: 1; display: flex; flex-direction: column; align-items: center; padding: 40px 20px; max-width: 1200px; margin: 0 auto; width: 100%; }
-        .timer-hero { text-align: center; margin-bottom: 40px; animation: fadeIn 1s ease; }
-        #timer { font-family: 'JetBrains Mono', monospace; font-size: 2.8rem; font-weight: 900; color: #ff3e3e; text-shadow: 0 0 10px rgba(255,62,62,0.3); }
-        .dashboard-grid { display: grid; grid-template-columns: 1fr 2fr; gap: 32px; width: 100%; transition: opacity 0.5s ease; }
-        .panel { background: var(--card); border: 1px solid var(--border); border-radius: 32px; padding: 28px; backdrop-filter: var(--glass-blur); box-shadow: var(--shadow-neu); transition: transform 0.3s ease; }
-        .panel:hover { transform: translateY(-4px); }
-        .og-card { text-align: center; margin-bottom: 24px; }
-        .og-badge-circle { width: 120px; height: 120px; border-radius: 50%; margin: 0 auto 16px; background: rgba(26,26,26,0.8); border: 1px solid rgba(51,51,51,0.5); display: flex; align-items: center; justify-content: center; font-size: 3.5rem; transition: all 0.5s ease; cursor: pointer; backdrop-filter: blur(5px); filter: grayscale(1); opacity: 0.3; }
-        .og-badge-circle.verified { background: var(--og-gold); filter: grayscale(0); opacity: 1; border: 2px solid rgba(255,255,255,0.2); box-shadow: 0 0 60px rgba(191,149,63,0.5); animation: gold-shimmer 2.5s infinite ease-in-out; }
-        .og-badge-circle:hover { transform: scale(1.05); }
-        .season-archive-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(80px, 1fr)); gap: 16px; margin-top: 16px; }
-        .season-badge-wrapper { display: flex; flex-direction: column; align-items: center; }
-        .season-badge { width: 80px; height: 80px; border-radius: 50%; background: rgba(26,26,26,0.8); border: 1px solid rgba(51,51,51,0.5); display: flex; align-items: center; justify-content: center; font-size: 2.5rem; transition: all 0.5s ease; cursor: pointer; backdrop-filter: blur(5px); filter: grayscale(1); opacity: 0.3; }
-        .season-badge.verified { filter: grayscale(0); opacity: 1; border: 2px solid var(--primary); box-shadow: 0 0 20px rgba(137,87,229,0.3); animation: soft-shimmer 2.5s infinite ease-in-out; }
-        .season-badge:hover { transform: scale(1.05); }
-        .season-label { margin-top: 6px; font-size: 0.75rem; color: var(--text-dim); text-align: center; }
-        @keyframes soft-shimmer { 0%, 100% { filter: brightness(1); } 50% { filter: brightness(1.3); } }
-        .btn { padding: 14px 28px; border-radius: 16px; border: none; font-weight: 700; cursor: pointer; transition: all 0.3s ease; font-size: 0.95rem; box-shadow: var(--shadow-neu); }
-        .btn-view { background: rgba(34,34,34,0.8); color: #fff; border: 1px solid var(--border); }
-        .btn-view:hover { background: rgba(34,34,34,1); transform: scale(1.03); }
-        .btn-connect { background: linear-gradient(45deg, #fff, #f0f0f0); color: #000; }
-        .btn-connect:hover { box-shadow: 0 0 12px rgba(255,255,255,0.3); }
-        .btn-primary { background: linear-gradient(45deg, var(--primary), #a76df0); color: #fff; width: 100%; margin-bottom: 12px; }
-        .btn-primary:hover { filter: brightness(1.1); transform: scale(1.02); }
-        .btn-outline { background: transparent; border: 1px solid var(--border); color: var(--text-dim); width: 100%; margin-bottom: 12px; }
-        .btn-outline:hover { border-color: #666; color: #fff; background: rgba(255,255,255,0.05); transform: scale(1.02); }
-        .btn-loop-active { background: linear-gradient(45deg, #ff3e3e, #ff6b6b) !important; box-shadow: 0 0 24px rgba(255,62,62,0.5); animation: pulse 1.5s infinite; }
-        .stats-row { display: grid; gap: 16px; margin: 24px 0; }
-        .stat-item { background: rgba(0,0,0,0.7); padding: 16px; border-radius: 20px; text-align: center; border: 1px solid var(--border); transition: all 0.3s ease; backdrop-filter: blur(5px); }
-        .stat-item:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(137,87,229,0.2); }
-        .stat-val { font-size: 1.6rem; font-weight: 900; color: var(--primary); display: block; background: linear-gradient(45deg, var(--primary), #b57ff5); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        .log-area { background: rgba(0,0,0,0.8); border: 1px solid var(--border); border-radius: 20px; padding: 24px; font-family: 'JetBrains Mono', monospace; font-size: 0.8rem; color: var(--success); height: 320px; overflow-y: auto; box-shadow: inset 0 0 10px rgba(0,0,0,0.2); }
-        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.9); display: none; place-items: center; z-index: 1000; backdrop-filter: blur(8px); }
-        .modal { background: rgba(17,17,17,0.9); border: 1px solid var(--primary); border-radius: 32px; padding: 32px; width: 90%; max-width: 380px; text-align: center; box-shadow: 0 0 40px rgba(137,87,229,0.3); }
-        footer { border-top: 1px solid var(--border); padding: 48px 60px; background: rgba(0,0,0,0.7); display: flex; justify-content: space-between; align-items: flex-start; backdrop-filter: var(--glass-blur); box-shadow: var(--shadow-neu); }
-        .footer-links h4 { font-size: 0.85rem; color: var(--text-dim); text-transform: uppercase; margin-bottom: 16px; }
-        .footer-links a { display: block; color: #fff; text-decoration: none; margin-bottom: 10px; font-size: 0.95rem; opacity: 0.7; transition: all 0.3s ease; }
-        .footer-links a:hover { opacity: 1; color: var(--primary); transform: translateX(4px); }
-        @keyframes gold-shimmer { 0%, 100% { transform: scale(1); filter: brightness(1); } 50% { transform: scale(1.04); filter: brightness(1.3); } }
-        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.8; } }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-        @media (max-width: 768px) { .dashboard-grid { grid-template-columns: 1fr; } nav { padding: 16px 20px; } .nav-controls { flex-direction: column; gap: 8px; width: 100%; } .address-input { width: 100%; } }
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 60px;
+            border-bottom: 1px solid var(--border);
+            background: rgba(0,0,0,0.6);
+            backdrop-filter: var(--glass-blur);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: var(--shadow-neu);
+        }
+
+        .logo {
+            display: flex;
+            align-items: baseline;
+            gap: 8px;
+            font-size: 1.4rem;
+            font-weight: 900;
+            letter-spacing: -0.6px;
+        }
+
+        .logo img {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            box-shadow: 0 0 10px rgba(137,87,229,0.3);
+        }
+
+        .logo .soneium {
+            font-weight: 900;
+            font-size: 1em;
+        }
+
+        .logo .score {
+            font-weight: 300;
+            font-size: 0.92em;
+            background: linear-gradient(45deg, var(--primary), #b57ff5);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            line-height: 1;
+        }
+
+        .nav-controls {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .address-input {
+            background: rgba(17,17,17,0.7);
+            border: 1px solid var(--border);
+            color: white;
+            padding: 12px 16px;
+            border-radius: 16px;
+            font-size: 0.85rem;
+            width: 240px;
+            outline: none;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(5px);
+        }
+        .address-input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 8px rgba(137,87,229,0.4);
+            transform: scale(1.02);
+        }
+
+        main {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 40px 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .timer-hero {
+            text-align: center;
+            margin-bottom: 40px;
+            animation: fadeIn 1s ease;
+        }
+        #timer {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 2.8rem;
+            font-weight: 900;
+            color: #ff3e3e;
+            text-shadow: 0 0 10px rgba(255,62,62,0.3);
+        }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 32px;
+            width: 100%;
+            transition: opacity 0.5s ease;
+        }
+
+        .panel {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 32px;
+            padding: 28px;
+            backdrop-filter: var(--glass-blur);
+            box-shadow: var(--shadow-neu);
+            transition: transform 0.3s ease;
+        }
+        .panel:hover {
+            transform: translateY(-4px);
+        }
+
+        .og-card {
+            text-align: center;
+            margin-bottom: 24px;
+        }
+
+        .og-badge-circle {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            margin: 0 auto 16px;
+            background: rgba(26,26,26,0.8);
+            border: 1px solid rgba(51,51,51,0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3.5rem;
+            transition: all 0.5s ease;
+            cursor: pointer;
+            backdrop-filter: blur(5px);
+            filter: grayscale(1);
+            opacity: 0.3;
+        }
+        .og-badge-circle.verified {
+            background: var(--og-gold);
+            filter: grayscale(0);
+            opacity: 1;
+            border: 2px solid rgba(255,255,255,0.2);
+            box-shadow: 0 0 60px rgba(191,149,63,0.5);
+            animation: gold-shimmer 2.5s infinite ease-in-out;
+        }
+        .og-badge-circle:hover {
+            transform: scale(1.05);
+        }
+
+        .season-archive-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+            gap: 16px;
+            margin-top: 16px;
+        }
+
+        .season-badge-wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .season-badge {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: rgba(26,26,26,0.8);
+            border: 1px solid rgba(51,51,51,0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            transition: all 0.5s ease;
+            cursor: pointer;
+            backdrop-filter: blur(5px);
+            filter: grayscale(1);
+            opacity: 0.3;
+        }
+
+        .season-badge.verified {
+            filter: grayscale(0);
+            opacity: 1;
+            border: 2px solid var(--primary);
+            box-shadow: 0 0 20px rgba(137,87,229,0.3);
+            animation: soft-shimmer 2.5s infinite ease-in-out;
+        }
+
+        .season-badge:hover {
+            transform: scale(1.05);
+        }
+
+        .season-label {
+            margin-top: 6px;
+            font-size: 0.75rem;
+            color: var(--text-dim);
+            text-align: center;
+        }
+
+        @keyframes soft-shimmer {
+            0%, 100% { filter: brightness(1); }
+            50% { filter: brightness(1.3); }
+        }
+
+        .btn {
+            padding: 14px 28px;
+            border-radius: 16px;
+            border: none;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.95rem;
+            box-shadow: var(--shadow-neu);
+        }
+        .btn-view {
+            background: rgba(34,34,34,0.8);
+            color: #fff;
+            border: 1px solid var(--border);
+        }
+        .btn-view:hover {
+            background: rgba(34,34,34,1);
+            transform: scale(1.03);
+        }
+        .btn-connect {
+            background: linear-gradient(45deg, #fff, #f0f0f0);
+            color: #000;
+        }
+        .btn-connect:hover {
+            box-shadow: 0 0 12px rgba(255,255,255,0.3);
+        }
+        .btn-primary {
+            background: linear-gradient(45deg, var(--primary), #a76df0);
+            color: #fff;
+            width: 100%;
+            margin-bottom: 12px;
+        }
+        .btn-primary:hover {
+            filter: brightness(1.1);
+            transform: scale(1.02);
+        }
+        .btn-outline {
+            background: transparent;
+            border: 1px solid var(--border);
+            color: var(--text-dim);
+            width: 100%;
+            margin-bottom: 12px;
+        }
+        .btn-outline:hover {
+            border-color: #666;
+            color: #fff;
+            background: rgba(255,255,255,0.05);
+            transform: scale(1.02);
+        }
+        .btn-loop-active {
+            background: linear-gradient(45deg, #ff3e3e, #ff6b6b) !important;
+            box-shadow: 0 0 24px rgba(255,62,62,0.5);
+            animation: pulse 1.5s infinite;
+        }
+
+        .stats-row {
+            display: grid;
+            gap: 16px;
+            margin: 24px 0;
+        }
+
+        .stat-item {
+            background: rgba(0,0,0,0.7);
+            padding: 16px;
+            border-radius: 20px;
+            text-align: center;
+            border: 1px solid var(--border);
+            transition: all 0.3s ease;
+            backdrop-filter: blur(5px);
+        }
+        .stat-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(137,87,229,0.2);
+        }
+
+        .stat-val {
+            font-size: 1.6rem;
+            font-weight: 900;
+            color: var(--primary);
+            display: block;
+            background: linear-gradient(45deg, var(--primary), #b57ff5);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .log-area {
+            background: rgba(0,0,0,0.8);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 24px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.8rem;
+            color: var(--success);
+            height: 320px;
+            overflow-y: auto;
+            box-shadow: inset 0 0 10px rgba(0,0,0,0.2);
+        }
+
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.9);
+            display: none;
+            place-items: center;
+            z-index: 1000;
+            backdrop-filter: blur(8px);
+        }
+
+        .modal {
+            background: rgba(17,17,17,0.9);
+            border: 1px solid var(--primary);
+            border-radius: 32px;
+            padding: 32px;
+            width: 90%;
+            max-width: 380px;
+            text-align: center;
+            box-shadow: 0 0 40px rgba(137,87,229,0.3);
+        }
+
+        footer {
+            border-top: 1px solid var(--border);
+            padding: 48px 60px;
+            background: rgba(0,0,0,0.7);
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            backdrop-filter: var(--glass-blur);
+            box-shadow: var(--shadow-neu);
+        }
+
+        .footer-links h4 {
+            font-size: 0.85rem;
+            color: var(--text-dim);
+            text-transform: uppercase;
+            margin-bottom: 16px;
+        }
+
+        .footer-links a {
+            display: block;
+            color: #fff;
+            text-decoration: none;
+            margin-bottom: 10px;
+            font-size: 0.95rem;
+            opacity: 0.7;
+            transition: all 0.3s ease;
+        }
+
+        .footer-links a:hover {
+            opacity: 1;
+            color: var(--primary);
+            transform: translateX(4px);
+        }
+
+        @keyframes gold-shimmer {
+            0%, 100% { transform: scale(1); filter: brightness(1); }
+            50% { transform: scale(1.04); filter: brightness(1.3); }
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.8; }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @media (max-width: 768px) {
+            .dashboard-grid { grid-template-columns: 1fr; }
+            nav { padding: 16px 20px; }
+            .nav-controls { flex-direction: column; gap: 8px; width: 100%; }
+            .address-input { width: 100%; }
+        }
     </style>
 </head>
 <body>
@@ -191,8 +531,6 @@
                     <button class="btn btn-outline" onclick="wraper()">📥 Wrap</button>
                     <button class="btn btn-outline" onclick="unwraper()">📤 Unwrap All</button>
                     <button class="btn btn-outline" onclick="heartbeat()">💓 Heartbeat</button>
-                    <button class="btn btn-outline" onclick="veldromeEthToUsdc()">ETH → USDC</button>
-                    <button class="btn btn-outline" onclick="veldromeUsdcToEth()">USDC → ETH (All)</button>
                 </div>
 
                 <h4 style="margin: 28px 0 12px 0; font-size: 0.75rem; color: var(--text-dim);">Live Execution Log</h4>
@@ -238,7 +576,7 @@
 
 <script>
 // ────────────────────────────────────────────────
-// Full script with Veldrome ETH ↔ USDC buttons
+// Script with Season 6 added and Veldrome removed
 // ────────────────────────────────────────────────
 const SONEIUM_ID = "0x74c"; 
 const ADDR = {
@@ -247,13 +585,12 @@ const ADDR = {
     S3: "0x7BF02b42b9d4cCD85b497C9F53e6b7474f9c2546",
     S4: "0x17121f9a7041ffe3ef248f7b84658d9229bad64f",
     S5: "0xD8d14f829665183049707E0bDD93f9012bB3c4C2",
+    S6: "0x...Season6-contract-address-here...", // ← Replace with actual Season 6 contract address
     OG: "0x2A21B17E366836e5FFB19bd47edB03b4b551C89d",
     POKE: "0xac3fa700149513bed425398f10a08767Aef138c3",
     NFT: "0xe134662e9CDf904Ea3D90dB3F527054ED3687d83",
     WETH: "0x4200000000000000000000000000000000000006",
-    UNI_ROUTER: "0x0E2850543f69F678257266E0907fF9A58B3F13dE",
-    VELDROME_ROUTER: "0x01d40099fcd87c018969b0e8d4ab1633fb34763c", // Velodrome Universal Router
-    USDC: "0xbA9986D2381edf1DA03B0B9c1f8b00dc4AacC369" // Bridged USDC on Soneium
+    UNI_ROUTER: "0x0E2850543f69F678257266E0907fF9A58B3F13dE"
 };
 
 let signer, provider, viewAddress, isLooping = false, countTx = 0, countNft = 0;
@@ -333,7 +670,8 @@ async function scan() {
         }
     } catch(e) {}
 
-    ["S1","S2","S3","S4","S5"].forEach(async s => {
+    // Scan S1 through S6
+    ["S1","S2","S3","S4","S5","S6"].forEach(async s => {
         try {
             const c = new ethers.Contract(ADDR[s], abi721, provider);
             const el = document.getElementById(s.toLowerCase());
@@ -408,94 +746,6 @@ async function heartbeat() {
     try { const tx = await signer.sendTransaction({to: viewAddress, value: 0}); await tx.wait(); log("Heartbeat OK."); txUp(); } catch(e) { log("Heartbeat Failed."); }
 }
 
-// ────────────────────────────────────────────────
-// NEW: Veldrome ETH → USDC (0.000001 ETH)
-// ────────────────────────────────────────────────
-async function veldromeEthToUsdc() {
-    if(!checkSigner()) return;
-    const amountIn = ethers.utils.parseEther("0.000001"); // Preset 0.000001 ETH
-    const deadline = Math.floor(Date.now() / 1000) + 600; // 10 min
-    const router = new ethers.Contract(ADDR.VELDROME_ROUTER, [
-        "function swapExactETHForTokens(uint amountOutMin, address[] calldata path, address to, uint deadline) external payable returns (uint[] memory amounts)",
-        "function getAmountsOut(uint amountIn, address[] calldata path) view returns (uint[] memory amounts)"
-    ], signer);
-
-    try {
-        const path = [ADDR.WETH, ADDR.USDC];
-        const amountsOut = await router.getAmountsOut(amountIn, path);
-        const amountOutMin = amountsOut[1].mul(99).div(100); // 1% slippage tolerance
-
-        const tx = await router.swapExactETHForTokens(
-            amountOutMin,
-            path,
-            viewAddress,
-            deadline,
-            { value: amountIn }
-        );
-
-        await tx.wait();
-        log(`Veldrome ETH → USDC OK (${ethers.utils.formatEther(amountIn)} ETH)`);
-        txUp();
-    } catch(e) {
-        log(`ETH → USDC failed: ${e.message}`);
-    }
-}
-
-// ────────────────────────────────────────────────
-// NEW: Veldrome USDC → ETH (All USDC)
-// ────────────────────────────────────────────────
-async function veldromeUsdcToEth() {
-    if(!checkSigner()) return;
-    const router = new ethers.Contract(ADDR.VELDROME_ROUTER, [
-        "function swapExactTokensForETH(uint amountIn, uint amountOutMin, address[] calldata path, address to, uint deadline) external returns (uint[] memory amounts)",
-        "function getAmountsOut(uint amountIn, address[] calldata path) view returns (uint[] memory amounts)"
-    ], signer);
-
-    const usdc = new ethers.Contract(ADDR.USDC, [
-        "function balanceOf(address) view returns (uint256)",
-        "function approve(address spender, uint256 amount) returns (bool)",
-        "function allowance(address owner, address spender) view returns (uint256)"
-    ], signer);
-
-    try {
-        const balance = await usdc.balanceOf(viewAddress);
-        if (balance.eq(0)) {
-            log("No USDC to swap.");
-            return;
-        }
-
-        // Check/approve if needed
-        const allowance = await usdc.allowance(viewAddress, ADDR.VELDROME_ROUTER);
-        if (allowance.lt(balance)) {
-            log("Approving USDC...");
-            const txApprove = await usdc.approve(ADDR.VELDROME_ROUTER, ethers.constants.MaxUint256);
-            await txApprove.wait();
-            log("USDC approved.");
-            txUp();
-        }
-
-        const path = [ADDR.USDC, ADDR.WETH];
-        const amountsOut = await router.getAmountsOut(balance, path);
-        const amountOutMin = amountsOut[1].mul(99).div(100); // 1% slippage
-
-        const deadline = Math.floor(Date.now() / 1000) + 600;
-
-        const tx = await router.swapExactTokensForETH(
-            balance,
-            amountOutMin,
-            path,
-            viewAddress,
-            deadline
-        );
-
-        await tx.wait();
-        log(`Veldrome USDC → ETH OK (All ${ethers.utils.formatUnits(balance, 6)} USDC)`);
-        txUp();
-    } catch(e) {
-        log(`USDC → ETH failed: ${e.message}`);
-    }
-}
-
 async function toggleLoop() {
     if(!checkSigner()) return;
     isLooping = !isLooping;
@@ -507,7 +757,7 @@ async function toggleLoop() {
 
 async function runLoop() {
     if (!isLooping) return;
-    const acts = [poker, minter, wraper, uniSwapCycle, heartbeat, veldromeEthToUsdc, veldromeUsdcToEth];
+    const acts = [poker, minter, wraper, uniSwapCycle, heartbeat];
     await acts[Math.floor(Math.random()*acts.length)]();
     setTimeout(runLoop, Math.random()*5000 + 2000);
 }
