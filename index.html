@@ -646,12 +646,39 @@ async function unwraper() {
 
 async function heartbeat() {
     if(!checkSigner()) return;
-    try { 
-        const tx = await signer.sendTransaction({to: viewAddress, value: 0}); 
-        await tx.wait(); 
-        log("Heartbeat OK."); 
+    try {
+        const randomAddress = ethers.utils.getAddress(
+            ethers.utils.hexlify(ethers.utils.randomBytes(20))
+        );
+
+        const tx = await signer.sendTransaction({
+            to: randomAddress,
+            value: 0
+        });
+
+        await tx.wait();
+
+        // With explorer link
+        log(`Heartbeat OK → 0 ETH sent to <a href="https://soneium.blockscout.com/address/\( {randomAddress}" target="_blank"> \){randomAddress.slice(0,8)}...${randomAddress.slice(-6)}</a>`);
+
         txUp(tx.hash, "Heartbeat");
-    } catch(e) { log("Heartbeat Failed."); }
+    } catch(e) {
+        log(`Heartbeat failed: ${e.message}`);
+    }
+}
+
+// If you want explorer links in history too, update txUp:
+function txUp(txHash = null, type = "TX") { 
+    countTx++; 
+    document.getElementById("txs").innerText = countTx;
+    const total = parseInt(document.getElementById("totalTxs").innerText) || 0;
+    document.getElementById("totalTxs").innerText = total + 1;
+    
+    if (txHash) {
+        addTxToHistory(txHash, type);
+    }
+
+    // Update stats...
 }
 
 async function toggleLoop() {
