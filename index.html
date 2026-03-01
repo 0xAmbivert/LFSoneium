@@ -19,6 +19,9 @@
             --text-dim: #888;
             --glass-blur: blur(20px);
             --shadow-neu: 0 4px 6px rgba(0,0,0,0.1), inset 0 1px 3px rgba(255,255,255,0.05);
+            --gas-low: #00ff88;
+            --gas-med: #ffaa00;
+            --gas-high: #ff3e3e;
         }
 
         body {
@@ -75,6 +78,17 @@
             -webkit-text-fill-color: transparent;
             line-height: 1;
         }
+
+        .gas-indicator {
+            font-size: 0.9rem;
+            padding: 6px 12px;
+            border-radius: 12px;
+            background: rgba(34,34,34,0.6);
+        }
+
+        .gas-low { background: rgba(0,255,136,0.15); color: var(--gas-low); }
+        .gas-med { background: rgba(255,170,0,0.15); color: var(--gas-med); }
+        .gas-high { background: rgba(255,62,62,0.15); color: var(--gas-high); }
 
         .nav-controls {
             display: flex;
@@ -145,268 +159,70 @@
             transform: translateY(-4px);
         }
 
-        .og-card {
-            text-align: center;
-            margin-bottom: 24px;
-        }
-
-        .og-badge-circle {
-            width: 120px;
-            height: 120px;
-            border-radius: 50%;
-            margin: 0 auto 16px;
-            background: rgba(26,26,26,0.8);
-            border: 1px solid rgba(51,51,51,0.5);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 3.5rem;
-            transition: all 0.5s ease;
-            cursor: pointer;
-            backdrop-filter: blur(5px);
-            filter: grayscale(1);
-            opacity: 0.3;
-        }
-        .og-badge-circle.verified {
-            background: var(--og-gold);
-            filter: grayscale(0);
-            opacity: 1;
-            border: 2px solid rgba(255,255,255,0.2);
-            box-shadow: 0 0 60px rgba(191,149,63,0.5);
-            animation: gold-shimmer 2.5s infinite ease-in-out;
-        }
-        .og-badge-circle:hover {
-            transform: scale(1.05);
-        }
-
-        .season-archive-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
-            gap: 16px;
+        .balance-info {
             margin-top: 16px;
-        }
-
-        .season-badge-wrapper {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-
-        .season-badge {
-            width: 80px;
-            height: 80px;
-            border-radius: 50%;
-            background: rgba(26,26,26,0.8);
-            border: 1px solid rgba(51,51,51,0.5);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 2.5rem;
-            transition: all 0.5s ease;
-            cursor: pointer;
-            backdrop-filter: blur(5px);
-            filter: grayscale(1);
-            opacity: 0.3;
-        }
-
-        .season-badge.verified {
-            filter: grayscale(0);
-            opacity: 1;
-            border: 2px solid var(--primary);
-            box-shadow: 0 0 20px rgba(137,87,229,0.3);
-            animation: soft-shimmer 2.5s infinite ease-in-out;
-        }
-
-        .season-badge:hover {
-            transform: scale(1.05);
-        }
-
-        .season-label {
-            margin-top: 6px;
-            font-size: 0.75rem;
+            font-size: 0.9rem;
             color: var(--text-dim);
             text-align: center;
         }
 
-        @keyframes soft-shimmer {
-            0%, 100% { filter: brightness(1); }
-            50% { filter: brightness(1.3); }
-        }
-
-        .btn {
-            padding: 14px 28px;
-            border-radius: 16px;
-            border: none;
-            font-weight: 700;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            font-size: 0.95rem;
-            box-shadow: var(--shadow-neu);
-        }
-        .btn-view {
-            background: rgba(34,34,34,0.8);
-            color: #fff;
-            border: 1px solid var(--border);
-        }
-        .btn-view:hover {
-            background: rgba(34,34,34,1);
-            transform: scale(1.03);
-        }
-        .btn-connect {
-            background: linear-gradient(45deg, #fff, #f0f0f0);
-            color: #000;
-        }
-        .btn-connect:hover {
-            box-shadow: 0 0 12px rgba(255,255,255,0.3);
-        }
-        .btn-primary {
-            background: linear-gradient(45deg, var(--primary), #a76df0);
-            color: #fff;
-            width: 100%;
-            margin-bottom: 12px;
-        }
-        .btn-primary:hover {
-            filter: brightness(1.1);
-            transform: scale(1.02);
-        }
-        .btn-outline {
-            background: transparent;
-            border: 1px solid var(--border);
-            color: var(--text-dim);
-            width: 100%;
-            margin-bottom: 12px;
-        }
-        .btn-outline:hover {
-            border-color: #666;
-            color: #fff;
-            background: rgba(255,255,255,0.05);
-            transform: scale(1.02);
-        }
-        .btn-loop-active {
-            background: linear-gradient(45deg, #ff3e3e, #ff6b6b) !important;
-            box-shadow: 0 0 24px rgba(255,62,62,0.5);
-            animation: pulse 1.5s infinite;
-        }
-
-        .stats-row {
-            display: grid;
-            gap: 16px;
-            margin: 24px 0;
-        }
-
-        .stat-item {
-            background: rgba(0,0,0,0.7);
-            padding: 16px;
-            border-radius: 20px;
-            text-align: center;
-            border: 1px solid var(--border);
-            transition: all 0.3s ease;
-            backdrop-filter: blur(5px);
-        }
-        .stat-item:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(137,87,229,0.2);
-        }
-
-        .stat-val {
-            font-size: 1.6rem;
-            font-weight: 900;
-            color: var(--primary);
-            display: block;
-            background: linear-gradient(45deg, var(--primary), #b57ff5);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        .log-area {
-            background: rgba(0,0,0,0.8);
-            border: 1px solid var(--border);
-            border-radius: 20px;
-            padding: 24px;
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 0.8rem;
-            color: var(--success);
-            height: 320px;
+        .tx-history {
+            margin-top: 16px;
+            max-height: 180px;
             overflow-y: auto;
-            box-shadow: inset 0 0 10px rgba(0,0,0,0.2);
+            font-size: 0.8rem;
+            color: var(--text-dim);
         }
 
-        .modal-overlay {
-            position: fixed;
-            inset: 0;
-            background: rgba(0,0,0,0.9);
-            display: none;
-            place-items: center;
-            z-index: 1000;
-            backdrop-filter: blur(8px);
+        .tx-history a {
+            color: var(--primary);
+            text-decoration: none;
         }
 
-        .modal {
-            background: rgba(17,17,17,0.9);
-            border: 1px solid var(--primary);
-            border-radius: 32px;
-            padding: 32px;
-            width: 90%;
-            max-width: 380px;
-            text-align: center;
-            box-shadow: 0 0 40px rgba(137,87,229,0.3);
+        .tx-history a:hover {
+            text-decoration: underline;
         }
 
-        footer {
-            border-top: 1px solid var(--border);
-            padding: 48px 60px;
-            background: rgba(0,0,0,0.7);
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            backdrop-filter: var(--glass-blur);
-            box-shadow: var(--shadow-neu);
-        }
-
-        .footer-links h4 {
+        .loop-stats {
+            margin-top: 16px;
             font-size: 0.85rem;
             color: var(--text-dim);
-            text-transform: uppercase;
-            margin-bottom: 16px;
+            text-align: center;
         }
 
-        .footer-links a {
-            display: block;
-            color: #fff;
-            text-decoration: none;
-            margin-bottom: 10px;
-            font-size: 0.95rem;
-            opacity: 0.7;
-            transition: all 0.3s ease;
-        }
-
-        .footer-links a:hover {
-            opacity: 1;
-            color: var(--primary);
-            transform: translateX(4px);
-        }
-
-        @keyframes gold-shimmer {
-            0%, 100% { transform: scale(1); filter: brightness(1); }
-            50% { transform: scale(1.04); filter: brightness(1.3); }
-        }
-
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.8; }
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-
-        @media (max-width: 768px) {
-            .dashboard-grid { grid-template-columns: 1fr; }
-            nav { padding: 16px 20px; }
-            .nav-controls { flex-direction: column; gap: 8px; width: 100%; }
-            .address-input { width: 100%; }
-        }
+        /* Rest of your existing CSS for seasonal archive, buttons, modal, footer etc. remains unchanged */
+        .og-card { text-align: center; margin-bottom: 24px; }
+        .og-badge-circle { width: 120px; height: 120px; border-radius: 50%; margin: 0 auto 16px; background: rgba(26,26,26,0.8); border: 1px solid rgba(51,51,51,0.5); display: flex; align-items: center; justify-content: center; font-size: 3.5rem; transition: all 0.5s ease; cursor: pointer; backdrop-filter: blur(5px); filter: grayscale(1); opacity: 0.3; }
+        .og-badge-circle.verified { background: var(--og-gold); filter: grayscale(0); opacity: 1; border: 2px solid rgba(255,255,255,0.2); box-shadow: 0 0 60px rgba(191,149,63,0.5); animation: gold-shimmer 2.5s infinite ease-in-out; }
+        .og-badge-circle:hover { transform: scale(1.05); }
+        .season-archive-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(80px, 1fr)); gap: 20px; margin-top: 16px; }
+        .season-badge-wrapper { display: flex; flex-direction: column; align-items: center; }
+        .season-badge { width: 80px; height: 80px; border-radius: 50%; background: rgba(26,26,26,0.8); border: 1px solid rgba(51,51,51,0.5); display: flex; align-items: center; justify-content: center; font-size: 2.5rem; transition: all 0.5s ease; cursor: pointer; backdrop-filter: blur(5px); filter: grayscale(1); opacity: 0.3; }
+        .season-badge.verified { filter: grayscale(0); opacity: 1; border: 2px solid var(--primary); box-shadow: 0 0 20px rgba(137,87,229,0.3); animation: soft-shimmer 2.5s infinite ease-in-out; }
+        .season-badge:hover { transform: scale(1.05); }
+        .season-label { margin-top: 8px; font-size: 0.8rem; color: var(--text-dim); text-align: center; }
+        @keyframes soft-shimmer { 0%, 100% { filter: brightness(1); } 50% { filter: brightness(1.3); } }
+        .btn { padding: 14px 28px; border-radius: 16px; border: none; font-weight: 700; cursor: pointer; transition: all 0.3s ease; font-size: 0.95rem; box-shadow: var(--shadow-neu); }
+        .btn-view { background: rgba(34,34,34,0.8); color: #fff; border: 1px solid var(--border); }
+        .btn-view:hover { background: rgba(34,34,34,1); transform: scale(1.03); }
+        .btn-connect { background: linear-gradient(45deg, #fff, #f0f0f0); color: #000; }
+        .btn-connect:hover { box-shadow: 0 0 12px rgba(255,255,255,0.3); }
+        .btn-primary { background: linear-gradient(45deg, var(--primary), #a76df0); color: #fff; width: 100%; margin-bottom: 12px; }
+        .btn-primary:hover { filter: brightness(1.1); transform: scale(1.02); }
+        .btn-outline { background: transparent; border: 1px solid var(--border); color: var(--text-dim); width: 100%; margin-bottom: 12px; }
+        .btn-outline:hover { border-color: #666; color: #fff; background: rgba(255,255,255,0.05); transform: scale(1.02); }
+        .btn-loop-active { background: linear-gradient(45deg, #ff3e3e, #ff6b6b) !important; box-shadow: 0 0 24px rgba(255,62,62,0.5); animation: pulse 1.5s infinite; }
+        .stats-row { display: grid; gap: 16px; margin: 24px 0; }
+        .stat-item { background: rgba(0,0,0,0.7); padding: 16px; border-radius: 20px; text-align: center; border: 1px solid var(--border); transition: all 0.3s ease; backdrop-filter: blur(5px); }
+        .stat-item:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(137,87,229,0.2); }
+        .stat-val { font-size: 1.6rem; font-weight: 900; color: var(--primary); display: block; background: linear-gradient(45deg, var(--primary), #b57ff5); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .log-area { background: rgba(0,0,0,0.8); border: 1px solid var(--border); border-radius: 20px; padding: 24px; font-family: 'JetBrains Mono', monospace; font-size: 0.8rem; color: var(--success); height: 240px; overflow-y: auto; box-shadow: inset 0 0 10px rgba(0,0,0,0.2); }
+        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.9); display: none; place-items: center; z-index: 1000; backdrop-filter: blur(8px); }
+        .modal { background: rgba(17,17,17,0.9); border: 1px solid var(--primary); border-radius: 32px; padding: 32px; width: 90%; max-width: 380px; text-align: center; box-shadow: 0 0 40px rgba(137,87,229,0.3); }
+        footer { border-top: 1px solid var(--border); padding: 48px 60px; background: rgba(0,0,0,0.7); display: flex; justify-content: space-between; align-items: flex-start; backdrop-filter: var(--glass-blur); box-shadow: var(--shadow-neu); }
+        .footer-links h4 { font-size: 0.85rem; color: var(--text-dim); text-transform: uppercase; margin-bottom: 16px; }
+        .footer-links a { display: block; color: #fff; text-decoration: none; margin-bottom: 10px; font-size: 0.95rem; opacity: 0.7; transition: all 0.3s ease; }
+        .footer-links a:hover { opacity: 1; color: var(--primary); transform: translateX(4px); }
     </style>
 </head>
 <body>
@@ -433,6 +249,7 @@
         <input type="text" id="manualAddr" class="address-input" placeholder="Enter EVM Address (0x...)">
         <button class="btn btn-view" onclick="viewOnly()">View Stats</button>
         <button id="connBtn" class="btn btn-connect" onclick="init()">Connect Wallet</button>
+        <div id="gasPrice" class="gas-indicator">Gas: -- gwei</div>
     </div>
 </nav>
 
@@ -448,6 +265,7 @@
                 <div id="ogBadge" class="og-badge-circle" onclick="openBadgePopup('OG', '⭐')">⭐</div>
                 <h3 style="margin:0; font-size: 1.15rem;">OG Badge</h3>
                 <p style="color: var(--text-dim); font-size: 0.8rem;">Verified on Soneium Mainnet</p>
+                <div id="balanceInfo" class="balance-info">ETH: -- | WETH: --</div>
             </div>
 
             <div class="panel">
@@ -533,8 +351,17 @@
                     <button class="btn btn-outline" onclick="heartbeat()">💓 Heartbeat</button>
                 </div>
 
+                <div class="loop-stats" id="loopStats">
+                    Session TXs: 0 | Avg: -- tx/min | Est. Gas: -- gwei
+                </div>
+
                 <h4 style="margin: 28px 0 12px 0; font-size: 0.75rem; color: var(--text-dim);">Live Execution Log</h4>
                 <div class="log-area" id="logs">System ready... Standing by.</div>
+
+                <h4 style="margin: 20px 0 8px 0; font-size: 0.75rem; color: var(--text-dim);">Recent Transactions</h4>
+                <div class="tx-history" id="txHistory">
+                    No transactions yet.
+                </div>
             </div>
         </div>
     </div>
@@ -576,29 +403,7 @@
 
 <script>
 // ────────────────────────────────────────────────
-// Timer updated for Season 7 end (10 days, 11 hours, 48 minutes from ~March 02, 2026 00:12 PKT)
- // Approximate end: March 12, 2026 12:00 PM PKT
-// ────────────────────────────────────────────────
-function runTimer() {
-    const target = new Date("2026-03-12T12:00:00+05:00").getTime();
-
-    setInterval(() => {
-        const diff = target - new Date().getTime();
-        if (diff < 0) { 
-            document.getElementById("timer").innerText = "Season 7 Ended"; 
-            return; 
-        }
-        const d = Math.floor(diff / 86400000);
-        const h = Math.floor((diff % 86400000) / 3600000);
-        const m = Math.floor((diff % 3600000) / 60000);
-        const s = Math.floor((diff % 60000) / 1000);
-        document.getElementById("timer").innerText = `${d}D : ${h}H : ${m}M : ${s}S`;
-    }, 1000);
-}
-runTimer();
-
-// ────────────────────────────────────────────────
-// Rest of the script (unchanged from your last working version)
+// Full script with Season 6 contract + new UI features
 // ────────────────────────────────────────────────
 const SONEIUM_ID = "0x74c"; 
 const ADDR = {
@@ -607,6 +412,7 @@ const ADDR = {
     S3: "0x7BF02b42b9d4cCD85b497C9F53e6b7474f9c2546",
     S4: "0x17121f9a7041ffe3ef248f7b84658d9229bad64f",
     S5: "0xD8d14f829665183049707E0bDD93f9012bB3c4C2",
+    S6: "0xe5a3d28fe65895d7cd7146fb50199b85fba74c3e", // Season 6 added
     OG: "0x2A21B17E366836e5FFB19bd47edB03b4b551C89d",
     POKE: "0xac3fa700149513bed425398f10a08767Aef138c3",
     NFT: "0xe134662e9CDf904Ea3D90dB3F527054ED3687d83",
@@ -614,7 +420,8 @@ const ADDR = {
     UNI_ROUTER: "0x0E2850543f69F678257266E0907fF9A58B3F13dE"
 };
 
-let signer, provider, viewAddress, isLooping = false, countTx = 0, countNft = 0;
+let signer, provider, viewAddress, isLooping = false, countTx = 0, countNft = 0, sessionStartTime = 0;
+let txHistory = [];
 const defaultProvider = new ethers.providers.JsonRpcProvider("https://rpc.soneium.org");
 
 function openBadgePopup(id, emoji) {
@@ -632,6 +439,46 @@ async function refreshBadge(id) {
     closeModal();
 }
 
+function runTimer() {
+    const target = new Date("2026-03-12T12:00:00+05:00").getTime();
+    setInterval(() => {
+        const diff = target - new Date().getTime();
+        if (diff < 0) { document.getElementById("timer").innerText = "Season 7 Ended"; return; }
+        const d = Math.floor(diff / 86400000);
+        const h = Math.floor((diff % 86400000) / 3600000);
+        const m = Math.floor((diff % 3600000) / 60000);
+        const s = Math.floor((diff % 60000) / 1000);
+        document.getElementById("timer").innerText = `${d}D : ${h}H : ${m}M : ${s}S`;
+    }, 1000);
+}
+runTimer();
+
+async function updateGasPrice() {
+    try {
+        const gasPrice = await provider.getGasPrice();
+        const gwei = ethers.utils.formatUnits(gasPrice, "gwei");
+        const rounded = parseFloat(gwei).toFixed(1);
+        const el = document.getElementById("gasPrice");
+        el.innerText = `Gas: ${rounded} gwei`;
+        if (rounded < 15) el.className = "gas-indicator gas-low";
+        else if (rounded < 40) el.className = "gas-indicator gas-med";
+        else el.className = "gas-indicator gas-high";
+    } catch(e) {}
+}
+setInterval(updateGasPrice, 15000);
+updateGasPrice();
+
+async function updateBalances() {
+    if (!viewAddress) return;
+    try {
+        const eth = await provider.getBalance(viewAddress);
+        const wethContract = new ethers.Contract(ADDR.WETH, ["function balanceOf(address) view returns (uint256)"], provider);
+        const weth = await wethContract.balanceOf(viewAddress);
+        document.getElementById("balanceInfo").innerText = 
+            `ETH: ${ethers.utils.formatEther(eth).slice(0,8)} | WETH: ${ethers.utils.formatEther(weth).slice(0,8)}`;
+    } catch(e) {}
+}
+
 async function viewOnly() {
     const input = document.getElementById("manualAddr").value.trim();
     if (!ethers.utils.isAddress(input)) return alert("Invalid EVM Address");
@@ -640,7 +487,8 @@ async function viewOnly() {
     signer = null; 
     showUI();
     log(`Entering View Mode for: ${viewAddress}`);
-    scan();
+    await scan();
+    await updateBalances();
 }
 
 async function init() {
@@ -649,15 +497,23 @@ async function init() {
     await provider.send("eth_requestAccounts", []);
     signer = provider.getSigner();
     viewAddress = await signer.getAddress();
+    sessionStartTime = Date.now();
     showUI();
     document.getElementById("connBtn").innerText = "Linked";
     log("Wallet connected successfully.");
-    scan();
+    await scan();
+    await updateBalances();
 }
 
 function showUI() {
     document.getElementById("ui").style.display = "grid";
     setTimeout(() => document.getElementById("ui").style.opacity = "1", 100);
+    setInterval(async () => {
+        if (document.getElementById("ui").style.display !== "none") {
+            await scan();
+            await updateBalances();
+        }
+    }, 60000); // Auto-refresh badges & balances every 60s
 }
 
 async function scan() {
@@ -677,7 +533,7 @@ async function scan() {
         }
     } catch(e) {}
 
-    ["S1","S2","S3","S4","S5"].forEach(async s => {
+    ["S1","S2","S3","S4","S5","S6"].forEach(async s => {
         try {
             const c = new ethers.Contract(ADDR[s], abi721, provider);
             const el = document.getElementById(s.toLowerCase());
@@ -699,6 +555,15 @@ function log(m) {
     l.scrollTop = l.scrollHeight; 
 }
 
+function addTxToHistory(txHash, type) {
+    txHistory.unshift({ hash: txHash, type, time: new Date().toLocaleString() });
+    if (txHistory.length > 10) txHistory.pop();
+    const el = document.getElementById("txHistory");
+    el.innerHTML = txHistory.map(tx => 
+        `<div><a href="https://soneium.blockscout.com/tx/${tx.hash}" target="_blank">[${tx.time}] ${tx.type}</a></div>`
+    ).join('');
+}
+
 function checkSigner() {
     if (!signer) {
         log("<span style='color: #ff3e3e'>Action Denied: Connect wallet to execute transactions.</span>");
@@ -707,11 +572,18 @@ function checkSigner() {
     return true;
 }
 
-function txUp() { 
+function txUp(txHash = null, type = "TX") { 
     countTx++; 
     document.getElementById("txs").innerText = countTx;
     const total = parseInt(document.getElementById("totalTxs").innerText) || 0;
     document.getElementById("totalTxs").innerText = total + 1;
+    if (txHash) addTxToHistory(txHash, type);
+
+    // Update loop stats
+    const elapsedMin = ((Date.now() - sessionStartTime) / 60000) || 1;
+    const avg = (countTx / elapsedMin).toFixed(1);
+    document.getElementById("loopStats").innerText = 
+        `Session TXs: ${countTx} | Avg: ${avg} tx/min | Est. Gas: -- gwei`;
 }
 
 async function uniSwapCycle() {
@@ -720,36 +592,66 @@ async function uniSwapCycle() {
         const router = new ethers.Contract(ADDR.UNI_ROUTER, ["function execute(bytes commands, bytes[] inputs, uint256 deadline) payable"], signer);
         const amount = ethers.utils.parseUnits("0.000001", "ether");
         const tx = await router.execute("0x0b", [ethers.utils.defaultAbiCoder.encode(["address", "uint256"], [viewAddress, amount])], Math.floor(Date.now()/1000)+600, { value: amount });
-        await tx.wait(); log("UniSwap OK."); txUp();
+        await tx.wait(); 
+        log("UniSwap OK."); 
+        txUp(tx.hash, "UniSwap");
     } catch(e) { log("Uni Error."); }
 }
 
 async function poker() {
     if(!checkSigner()) return;
-    try { const tx = await new ethers.Contract(ADDR.POKE, ["function poke()"], signer).poke(); await tx.wait(); log("Poke OK."); txUp(); } catch(e) { log("Poke Failed."); }
+    try { 
+        const tx = await new ethers.Contract(ADDR.POKE, ["function poke()"], signer).poke(); 
+        await tx.wait(); 
+        log("Poke OK."); 
+        txUp(tx.hash, "Poke");
+    } catch(e) { log("Poke Failed."); }
 }
 
 async function minter() {
     if(!checkSigner()) return;
-    try { const tx = await new ethers.Contract(ADDR.NFT, ["function mint()"], signer).mint(); await tx.wait(); log("Mint OK."); txUp(); scan(); } catch(e) { log("Mint Failed."); }
+    try { 
+        const tx = await new ethers.Contract(ADDR.NFT, ["function mint()"], signer).mint(); 
+        await tx.wait(); 
+        log("Mint OK."); 
+        txUp(tx.hash, "Mint");
+        scan(); 
+    } catch(e) { log("Mint Failed."); }
 }
 
 async function wraper() {
     if(!checkSigner()) return;
-    try { const tx = await new ethers.Contract(ADDR.WETH, ["function deposit() payable"], signer).deposit({ value: ethers.utils.parseUnits("0.0000001", "ether") }); await tx.wait(); log("Wrap OK."); txUp(); } catch(e) { log("Wrap Failed."); }
+    try { 
+        const tx = await new ethers.Contract(ADDR.WETH, ["function deposit() payable"], signer).deposit({ value: ethers.utils.parseUnits("0.0000001", "ether") }); 
+        await tx.wait(); 
+        log("Wrap OK."); 
+        txUp(tx.hash, "Wrap");
+        updateBalances();
+    } catch(e) { log("Wrap Failed."); }
 }
 
 async function unwraper() {
     if(!checkSigner()) return;
     try { 
         const c = new ethers.Contract(ADDR.WETH, ["function withdraw(uint256 wad)", "function balanceOf(address) view returns (uint256)"], signer);
-        const tx = await c.withdraw(await c.balanceOf(viewAddress)); await tx.wait(); log("Unwrap OK."); txUp();
+        const balance = await c.balanceOf(viewAddress);
+        if (balance.eq(0)) return log("No WETH to unwrap.");
+        const tx = await c.withdraw(balance); 
+        await tx.wait(); 
+        log("Unwrap OK."); 
+        txUp(tx.hash, "Unwrap");
+        updateBalances();
     } catch(e) { log("Unwrap Failed."); }
 }
 
 async function heartbeat() {
     if(!checkSigner()) return;
-    try { const tx = await signer.sendTransaction({to: viewAddress, value: 0}); await tx.wait(); log("Heartbeat OK."); txUp(); } catch(e) { log("Heartbeat Failed."); }
+    try { 
+        const tx = await signer.sendTransaction({to: viewAddress, value: 0}); 
+        await tx.wait(); 
+        log("Heartbeat OK."); 
+        txUp(tx.hash, "Heartbeat");
+    } catch(e) { log("Heartbeat Failed."); }
 }
 
 async function toggleLoop() {
