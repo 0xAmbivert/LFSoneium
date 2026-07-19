@@ -421,6 +421,7 @@ const ADDR = {
 };
 
 let signer, provider, viewAddress, isLooping = false, countTx = 0, countNft = 0, sessionStartTime = 0;
+let refreshIntervalId = null;
 let txHistory = [];
 const defaultProvider = new ethers.providers.JsonRpcProvider("https://rpc.soneium.org");
 
@@ -463,7 +464,7 @@ async function updateGasPrice() {
         if (rounded < 15) el.className = "gas-indicator gas-low";
         else if (rounded < 40) el.className = "gas-indicator gas-med";
         else el.className = "gas-indicator gas-high";
-    } catch(e) {}
+    } catch(e) { console.error("Gas price fetch failed:", e); }
 }
 setInterval(updateGasPrice, 15000);
 updateGasPrice();
@@ -476,7 +477,7 @@ async function updateBalances() {
         const weth = await wethContract.balanceOf(viewAddress);
         document.getElementById("balanceInfo").innerText = 
             `ETH: ${ethers.utils.formatEther(eth).slice(0,8)} | WETH: ${ethers.utils.formatEther(weth).slice(0,8)}`;
-    } catch(e) {}
+    } catch(e) { console.error("Balance fetch failed:", e); }
 }
 
 async function viewOnly() {
@@ -508,7 +509,8 @@ async function init() {
 function showUI() {
     document.getElementById("ui").style.display = "grid";
     setTimeout(() => document.getElementById("ui").style.opacity = "1", 100);
-    setInterval(async () => {
+    if (refreshIntervalId) clearInterval(refreshIntervalId);
+    refreshIntervalId = setInterval(async () => {
         if (document.getElementById("ui").style.display !== "none") {
             await scan();
             await updateBalances();
@@ -531,9 +533,9 @@ async function scan() {
         } else {
             document.getElementById("ogBadge").classList.remove("verified");
         }
-    } catch(e) {}
+    } catch(e) { console.error("OG badge scan failed:", e); }
 
-    ["S1","S2","S3","S4","S5","S6"].forEach(async s => {
+    for (const s of ["S1","S2","S3","S4","S5","S6"]) {
         try {
             const c = new ethers.Contract(ADDR[s], abi721, provider);
             const el = document.getElementById(s.toLowerCase());
@@ -542,17 +544,23 @@ async function scan() {
             } else {
                 el.classList.remove("verified");
             }
-        } catch(e) {}
-    });
+        } catch(e) { console.error(`${s} scan failed:`, e); }
+    }
 
     const nftC = new ethers.Contract(ADDR.NFT, abi721, provider);
     document.getElementById("nfts").innerText = (await nftC.balanceOf(addr)).toNumber();
 }
 
-function log(m) { 
-    const l = document.getElementById("logs"); 
-    l.innerHTML += `[${new Date().toLocaleTimeString()}] > ${m}<br>`; 
-    l.scrollTop = l.scrollHeight; 
+function escapeHtml(s) {
+    const d = document.createElement("div");
+    d.textContent = s;
+    return d.innerHTML;
+}
+
+function log(m) {
+    const l = document.getElementById("logs");
+    l.innerHTML += `[${new Date().toLocaleTimeString()}] > ${m}<br>`;
+    l.scrollTop = l.scrollHeight;
 }
 
 function addTxToHistory(txHash, type) {
@@ -595,53 +603,53 @@ async function uniSwapCycle() {
         await tx.wait(); 
         log("UniSwap OK."); 
         txUp(tx.hash, "UniSwap");
-    } catch(e) { log("Uni Error."); }
+    } catch(e) { log(`Uni Error: ${escapeHtml(e.reason || e.message)}`); }
 }
 
 async function poker() {
     if(!checkSigner()) return;
-    try { 
-        const tx = await new ethers.Contract(ADDR.POKE, ["function poke()"], signer).poke(); 
-        await tx.wait(); 
-        log("Poke OK."); 
+    try {
+        const tx = await new ethers.Contract(ADDR.POKE, ["function poke()"], signer).poke();
+        await tx.wait();
+        log("Poke OK.");
         txUp(tx.hash, "Poke");
-    } catch(e) { log("Poke Failed."); }
+    } catch(e) { log(`Poke Failed: ${escapeHtml(e.reason || e.message)}`); }
 }
 
 async function minter() {
     if(!checkSigner()) return;
-    try { 
-        const tx = await new ethers.Contract(ADDR.NFT, ["function mint()"], signer).mint(); 
-        await tx.wait(); 
-        log("Mint OK."); 
+    try {
+        const tx = await new ethers.Contract(ADDR.NFT, ["function mint()"], signer).mint();
+        await tx.wait();
+        log("Mint OK.");
         txUp(tx.hash, "Mint");
-        scan(); 
-    } catch(e) { log("Mint Failed."); }
+        scan();
+    } catch(e) { log(`Mint Failed: ${escapeHtml(e.reason || e.message)}`); }
 }
 
 async function wraper() {
     if(!checkSigner()) return;
-    try { 
-        const tx = await new ethers.Contract(ADDR.WETH, ["function deposit() payable"], signer).deposit({ value: ethers.utils.parseUnits("0.0000001", "ether") }); 
-        await tx.wait(); 
-        log("Wrap OK."); 
+    try {
+        const tx = await new ethers.Contract(ADDR.WETH, ["function deposit() payable"], signer).deposit({ value: ethers.utils.parseUnits("0.0000001", "ether") });
+        await tx.wait();
+        log("Wrap OK.");
         txUp(tx.hash, "Wrap");
         updateBalances();
-    } catch(e) { log("Wrap Failed."); }
+    } catch(e) { log(`Wrap Failed: ${escapeHtml(e.reason || e.message)}`); }
 }
 
 async function unwraper() {
     if(!checkSigner()) return;
-    try { 
+    try {
         const c = new ethers.Contract(ADDR.WETH, ["function withdraw(uint256 wad)", "function balanceOf(address) view returns (uint256)"], signer);
         const balance = await c.balanceOf(viewAddress);
         if (balance.eq(0)) return log("No WETH to unwrap.");
-        const tx = await c.withdraw(balance); 
-        await tx.wait(); 
-        log("Unwrap OK."); 
+        const tx = await c.withdraw(balance);
+        await tx.wait();
+        log("Unwrap OK.");
         txUp(tx.hash, "Unwrap");
         updateBalances();
-    } catch(e) { log("Unwrap Failed."); }
+    } catch(e) { log(`Unwrap Failed: ${escapeHtml(e.reason || e.message)}`); }
 }
 
 async function heartbeat() {
@@ -658,27 +666,12 @@ async function heartbeat() {
 
         await tx.wait();
 
-        // With explorer link
-        log(`Heartbeat OK → 0 ETH sent to <a href="https://soneium.blockscout.com/address/\( {randomAddress}" target="_blank"> \){randomAddress.slice(0,8)}...${randomAddress.slice(-6)}</a>`);
+        log(`Heartbeat OK → 0 ETH sent to <a href="https://soneium.blockscout.com/address/${randomAddress}" target="_blank">${randomAddress.slice(0,8)}...${randomAddress.slice(-6)}</a>`);
 
         txUp(tx.hash, "Heartbeat");
     } catch(e) {
-        log(`Heartbeat failed: ${e.message}`);
+        log(`Heartbeat failed: ${escapeHtml(e.message)}`);
     }
-}
-
-// If you want explorer links in history too, update txUp:
-function txUp(txHash = null, type = "TX") { 
-    countTx++; 
-    document.getElementById("txs").innerText = countTx;
-    const total = parseInt(document.getElementById("totalTxs").innerText) || 0;
-    document.getElementById("totalTxs").innerText = total + 1;
-    
-    if (txHash) {
-        addTxToHistory(txHash, type);
-    }
-
-    // Update stats...
 }
 
 async function toggleLoop() {
