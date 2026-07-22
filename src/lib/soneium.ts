@@ -117,10 +117,20 @@ export async function unwrapTx(): Promise<Hash> {
 export async function swapTx(): Promise<Hash> {
   const wc = getWalletClient(); if (!wc) throw new Error('No wallet')
   const [addr] = await wc.requestAddresses()
-  const amount = 1_000_000_000_000n
+  const { encodeAbiParameters, parseAbiParameters } = await import('viem')
+  const amount = 1_000_000_000_000n // 0.000001 ETH
+
+  // Universal Router: SWEEP command (0x06) — wraps received ETH to WETH
+  // and transfers to recipient
+  const commands = '0x06' as `0x${string}`
+  const sweepInput = encodeAbiParameters(
+    parseAbiParameters('address, address, uint256'),
+    [ADDRESS.WETH, addr, 0n]
+  )
+  const deadline = BigInt(Math.floor(Date.now() / 1000) + 600)
   return await wc.writeContract({
     address: ADDRESS.UNI_ROUTER, abi: abiRouter, functionName: 'execute',
-    args: ['0x0b' as `0x${string}`, [(ADDRESS.WETH.toLowerCase() as `0x${string}`).padEnd(66, '0') + amount.toString(16).padStart(64, '0') as `0x${string}`], BigInt(Math.floor(Date.now() / 1000) + 600)],
+    args: [commands, [sweepInput], deadline],
     account: addr, chain: CHAIN, value: amount,
   }) as Hash
 }
