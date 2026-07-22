@@ -4,10 +4,6 @@ import { abi721, abi1155, abiPoke, abiMint, abiWeth, abiRouter } from '@/contrac
 
 export const publicClient = createPublicClient({ chain: CHAIN, transport: http() })
 
-declare global {
-  interface Window { ethereum?: Record<string, unknown> & { request: (args: { method: string; params?: unknown[] }) => Promise<unknown>; isMetaMask?: boolean } }
-}
-
 export function getWalletClient() {
   if (!window.ethereum) return null
   return createWalletClient({ chain: CHAIN, transport: custom(window.ethereum) })
